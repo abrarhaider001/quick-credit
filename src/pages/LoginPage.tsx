@@ -1,28 +1,99 @@
-import { AnimatedPage } from '@/components/layout/AnimatedPage'
-import { FlowNav } from '@/components/layout/FlowNav'
-import { PageShell } from '@/components/layout/PageShell'
-import { Card } from '@/components/ui/Card'
+import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import { FiArrowRight, FiShield } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
 import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
+  const [fullName, setFullName] = useState('')
+  const [phoneDigits, setPhoneDigits] = useState('')
+  const [isNameFocused, setIsNameFocused] = useState(false)
+  const [isPhoneFocused, setIsPhoneFocused] = useState(false)
+
+  const maskedPhone = useMemo(() => {
+    if (phoneDigits.length <= 3) return phoneDigits
+    return `${phoneDigits.slice(0, 3)} ${phoneDigits.slice(3)}`
+  }, [phoneDigits])
+
+  const handlePhoneChange = (value: string) => {
+    const onlyDigits = value.replace(/\D/g, '').slice(0, 10)
+    setPhoneDigits(onlyDigits)
+  }
+
   return (
-    <AnimatedPage>
-      <main className="qc-main">
-        <PageShell
-          eyebrow="Authentication"
-          title="Welcome back"
-          description="Sign in with your phone or email. Form fields will be added in the Login page prompt."
-        />
-        <Card>
-          <p style={{ margin: 0, fontSize: '0.9375rem' }}>
-            Placeholder — inputs, validation, and API hooks arrive with your next prompt.
+    <motion.main
+      className="login-screen"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <section className="login-shell">
+        <div className="login-bg-block login-bg-block--one" aria-hidden />
+        <div className="login-bg-block login-bg-block--two" aria-hidden />
+        <div className="login-bg-block login-bg-block--three" aria-hidden />
+
+        <div className="login-brand">
+          <div className="login-brand__icon" aria-hidden>
+            <FiShield size={24} />
+          </div>
+          <h1 className="login-brand__title">QuickCredit</h1>
+          <p className="login-brand__subtitle">Create your secure gateway to growth</p>
+        </div>
+
+        <div className="login-card">
+          <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+            <label className="login-field">
+              <span className="login-field__label">Full Name</span>
+              <input
+                className={`login-input ${fullName.length > 0 ? 'login-input--active' : ''}`}
+                type="text"
+                placeholder="e.g. Rahul Sharma"
+                autoComplete="name"
+                value={fullName}
+                maxLength={20}
+                onChange={(e) => setFullName(e.target.value.slice(0, 20))}
+                onFocus={() => setIsNameFocused(true)}
+                onBlur={() => setIsNameFocused(false)}
+              />
+              {isNameFocused ? (
+                <span className="login-field__meta">{fullName.length}/20</span>
+              ) : null}
+            </label>
+
+            <label className="login-field">
+              <span className="login-field__label">Phone Number</span>
+              <div className={`login-phone ${phoneDigits.length > 0 ? 'login-phone--active' : ''}`}>
+                <span className="login-phone__code" aria-label="Country code">
+                  +91
+                </span>
+                <input
+                  className="login-input login-phone__input"
+                  type="tel"
+                  placeholder="111 2345678"
+                  autoComplete="tel"
+                  inputMode="numeric"
+                  value={maskedPhone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  onFocus={() => setIsPhoneFocused(true)}
+                  onBlur={() => setIsPhoneFocused(false)}
+                />
+              </div>
+              {/* <span className="login-field__hint">Mask format: 123 4567891</span> */}
+              {isPhoneFocused ? (
+                <span className="login-field__meta">{phoneDigits.length}/10</span>
+              ) : null}
+            </label>
+
+            <Link to={paths.otp} className="qc-btn qc-btn--primary login-continue">
+              Continue <FiArrowRight size={16} />
+            </Link>
+          </form>
+
+          <p className="login-support">
+            Having trouble logging into your account? Contact the support team.
           </p>
-        </Card>
-        <FlowNav
-          prev={{ to: paths.splash, label: 'Splash' }}
-          next={{ to: paths.otp, label: 'OTP' }}
-        />
-      </main>
-    </AnimatedPage>
+        </div>
+      </section>
+    </motion.main>
   )
 }
