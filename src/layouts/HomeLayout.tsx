@@ -42,6 +42,10 @@ export default function HomeLayout() {
               </NavLink>
             ))}
           </nav>
+
+          <p className="home-sidebar__copyright">
+            © {new Date().getFullYear()} QuickCredit
+          </p>
         </div>
       </aside>
 

@@ -1356,6 +1356,19 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+}
+
+.home-sidebar__copyright {
+  margin: 0;
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(226, 232, 255, 0.42);
+  text-align: center;
+  line-height: 1.4;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .home-nav-link {
@@ -1438,7 +1451,7 @@ a:hover {
 .home-content {
   flex: 1;
   width: 100%;
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: var(--qc-space-md);
 }
@@ -1476,23 +1489,33 @@ a:hover {
   line-height: 1.45;
 }
 
-/* Home dashboard — greeting, semicircle gauge, loan tiles */
+/* Home dashboard — masthead, offer banner, limits, loans, footer */
 .home-dashboard {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.25rem, 4vw, 2rem);
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   width: 100%;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
 }
 
-.home-dashboard__greet {
-  margin: 0 0 0.25rem;
-  padding-top: 4px;
+.home-dashboard__masthead {
+  margin: 0;
+  padding-top: 2px;
+}
+
+.home-dashboard__crumb {
+  margin: 0 0 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9ca3af;
 }
 
 .home-dashboard__greet-line {
   margin: 0;
   font-family: var(--qc-font-heading);
-  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  font-size: clamp(1.25rem, 3.8vw, 1.75rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--qc-text);
@@ -1504,47 +1527,120 @@ a:hover {
   font-weight: 700;
 }
 
-.home-dashboard__shell {
+/* Split informational banner */
+.home-offer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0;
+  border-radius: var(--qc-radius-md);
+  background: var(--qc-surface);
+  border: 1px solid var(--qc-border);
+  box-shadow: var(--qc-shadow-md);
+  overflow: hidden;
+}
+
+.home-offer__content {
+  padding: clamp(18px, 4vw, 28px) clamp(18px, 3vw, 28px);
   display: flex;
   flex-direction: column;
-  gap: clamp(1.25rem, 3vw, 1.75rem);
+  gap: 12px;
+  align-items: flex-start;
 }
 
-.home-dashboard__main {
-  min-width: 0;
+.home-offer__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.home-offer__title {
+  margin: 0;
+  font-family: var(--qc-font-heading);
+  font-size: clamp(1.2rem, 3.5vw, 1.65rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111827;
+  line-height: 1.25;
+  max-width: 36ch;
+}
+
+.home-offer__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+
+.home-offer__cta {
+  margin-top: 4px;
+  min-height: 44px;
+  padding-inline: 22px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* Banner art: desktop only */
+.home-offer__visual {
+  display: none;
+  background: #f0f0f7;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.home-offer__visual img {
   width: 100%;
-}
-
-.home-dashboard__aside {
-  min-width: 0;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (min-width: 900px) {
-  .home-dashboard__shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-    gap: clamp(28px, 4vw, 48px);
-    align-items: start;
+  .home-offer {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: stretch;
   }
 
-  .home-dashboard__main {
-    max-width: 640px;
-    margin-inline: auto;
+  .home-offer__visual {
+    display: flex;
+    min-height: 100%;
   }
 
-  .home-dashboard__aside {
-    position: sticky;
-    top: calc(var(--qc-space-md) + 4px);
+  .home-offer__visual img {
+    min-height: 260px;
   }
 }
 
-@media (max-width: 899px) {
-  .home-dashboard__aside {
-    order: -1;
+/* Credit gauge — mobile only (semicircle + min/max); desktop uses limits row */
+.home-credit--mobile-only {
+  display: block;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .home-credit--mobile-only {
+    display: none;
   }
 }
 
-/* Credit widget — mint accent + primary purple (theme) */
+.home-limits--desktop {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .home-limits--desktop {
+    display: block;
+  }
+}
+
+/* Credit widget — mint accent + semicircle gauge */
 .home-credit__widget {
   position: relative;
   display: flex;
@@ -1555,10 +1651,12 @@ a:hover {
   border-radius: var(--qc-radius-md);
   background:
     radial-gradient(120% 80% at 12% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 55%),
-    linear-gradient(155deg,
+    linear-gradient(
+      155deg,
       #4af095 0%,
       var(--qc-accent) 42%,
-      #2eb85c 100%);
+      #2eb85c 100%
+    );
   border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
     0 4px 24px rgba(57, 230, 107, 0.28),
@@ -1573,9 +1671,11 @@ a:hover {
   inset: auto -20% -40% -20%;
   height: 55%;
   border-radius: 50%;
-  background: radial-gradient(circle,
-      rgba(63, 54, 201, 0.12) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(63, 54, 201, 0.12) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -1680,6 +1780,179 @@ a:hover {
   color: var(--qc-primary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+/* Limits row — three stat cards */
+.home-limits {
+  width: 100%;
+}
+
+.home-limits__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: clamp(14px, 3vw, 20px);
+}
+
+.home-limits__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.home-limits__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.home-limits__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .home-limits__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+.home-limit-card {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: var(--qc-radius-sm);
+  background: var(--qc-surface);
+  border: 1px solid var(--qc-border);
+  box-shadow: var(--qc-shadow-sm);
+}
+
+.home-limit-card--accent {
+  border-color: rgba(63, 54, 201, 0.2);
+  box-shadow: var(--qc-shadow-md);
+}
+
+.home-limit-card__label {
+  margin: 0 0 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.home-limit-card__value {
+  margin: 0 0 10px;
+  font-family: var(--qc-font-heading);
+  font-size: clamp(1.35rem, 3.5vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111827;
+  line-height: 1.15;
+}
+
+.home-limit-card__bar {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #e8e9f6;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.home-limit-card__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--qc-primary), var(--qc-secondary));
+  transition: width 0.6s var(--qc-ease-out);
+}
+
+.home-limit-card__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+/* Dashboard footer — dark trust band */
+.home-dash-footer {
+  margin-top: clamp(0.5rem, 2vw, 1rem);
+  border-radius: var(--qc-radius-md);
+  background: #121620;
+  color: #e5e7eb;
+  overflow: hidden;
+}
+
+.home-dash-footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 28px) clamp(18px, 3vw, 24px);
+}
+
+@media (min-width: 768px) {
+  .home-dash-footer__inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+  }
+}
+
+.home-dash-footer__title {
+  margin: 0 0 10px;
+  font-family: var(--qc-font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.home-dash-footer__text {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(226, 232, 255, 0.72);
+  line-height: 1.55;
+  max-width: 42ch;
+}
+
+.home-dash-footer__badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.home-dash-footer__badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.home-dash-footer__badge svg {
+  color: var(--qc-accent);
+  flex-shrink: 0;
 }
 
 /* Loans — section header + horizontal tiles */
