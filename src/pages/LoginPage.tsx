@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiArrowRight, FiShield } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
+import { formatPhoneLoginMask } from '@/lib/phone'
 import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
@@ -84,7 +85,14 @@ export default function LoginPage() {
               ) : null}
             </label>
 
-            <Link to={paths.otp} className="qc-btn qc-btn--primary login-continue">
+            <Link
+              to={paths.otp}
+              state={{
+                phoneDigits,
+                phoneDisplay: formatPhoneLoginMask(phoneDigits),
+              }}
+              className="qc-btn qc-btn--primary login-continue"
+            >
               Continue <FiArrowRight size={16} />
             </Link>
           </form>

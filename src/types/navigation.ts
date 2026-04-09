@@ -1,0 +1,15 @@
+export type LoginToOtpState = {
+  phoneDigits: string
+  phoneDisplay: string
+}
+
+export function isLoginToOtpState(x: unknown): x is LoginToOtpState {
+  return (
+    typeof x === 'object' &&
+    x !== null &&
+    'phoneDigits' in x &&
+    typeof (x as LoginToOtpState).phoneDigits === 'string' &&
+    'phoneDisplay' in x &&
+    typeof (x as LoginToOtpState).phoneDisplay === 'string'
+  )
+}
