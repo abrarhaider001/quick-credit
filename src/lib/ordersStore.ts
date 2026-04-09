@@ -1,9 +1,18 @@
+import { RECOMMENDED_LOANS } from '@/data/recommendedLoans'
+
 export type LoanOrder = {
   id: string
   loanName: string
   amountLabel: string
   status: 'pending' | 'cleared'
   createdAt: number
+  imageUrl?: string
+  referenceId?: string
+  /** Display string e.g. ₹12,500 */
+  totalToPay?: string
+  dueDateMs?: number
+  loanAmountDisplay?: string
+  clearedAt?: number
 }
 
 const ORDERS_KEY = 'quickcredit.orders.v1'
@@ -54,14 +63,36 @@ export function tryApplyLoan(input: {
   amountLabel: string
 }): 'dues' | 'added' {
   if (hasPendingOrders()) return 'dues'
+  const match = RECOMMENDED_LOANS.find((l) => l.name === input.loanName)
+  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase()
   const next: LoanOrder = {
     id: `ord_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
     loanName: input.loanName,
     amountLabel: input.amountLabel,
     status: 'pending',
     createdAt: Date.now(),
+    imageUrl: match?.image,
+    referenceId: `Ref: #QC-${suffix}`,
+    totalToPay: match?.displayFigure ?? input.amountLabel,
+    dueDateMs: Date.now() + 14 * 24 * 60 * 60 * 1000,
+    loanAmountDisplay: match?.amount ?? input.amountLabel,
   }
   writeRaw([...getOrders(), next])
   notifyOrdersChanged()
   return 'added'
+}
+
+export function markOrderPaid(orderId: string): boolean {
+  const orders = getOrders()
+  const idx = orders.findIndex((o) => o.id === orderId && o.status === 'pending')
+  if (idx < 0) return false
+  const next = [...orders]
+  next[idx] = {
+    ...next[idx],
+    status: 'cleared',
+    clearedAt: Date.now(),
+  }
+  writeRaw(next)
+  notifyOrdersChanged()
+  return true
 }
