@@ -4,7 +4,7 @@ type SnackbarProps = {
   message: string
   open: boolean
   onClose: () => void
-  variant?: 'error' | 'info'
+  variant?: 'error' | 'info' | 'success'
 }
 
 export function Snackbar({ message, open, onClose, variant = 'info' }: SnackbarProps) {

@@ -33,6 +33,27 @@ export function formatDueDate(ms: number) {
   })
 }
 
+function dayOrdinal(day: number): string {
+  if (day >= 11 && day <= 13) return `${day}th`
+  switch (day % 10) {
+    case 1:
+      return `${day}st`
+    case 2:
+      return `${day}nd`
+    case 3:
+      return `${day}rd`
+    default:
+      return `${day}th`
+  }
+}
+
+/** e.g. "28th Oct 2023" for payment summaries */
+export function formatDueDateWithOrdinal(ms: number) {
+  const d = new Date(ms)
+  const monYear = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+  return `${dayOrdinal(d.getDate())} ${monYear}`
+}
+
 export function formatLoanDate(ms: number) {
   return new Date(ms).toLocaleDateString('en-IN', {
     day: 'numeric',

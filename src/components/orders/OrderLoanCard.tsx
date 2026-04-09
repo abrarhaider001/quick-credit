@@ -31,9 +31,19 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
       state: {
         orderId: order.id,
         demo: isDemo || order.id.startsWith('demo-'),
+        loan: {
+          id: order.id,
+          loanName: order.loanName,
+          totalToPay: order.totalToPay,
+          referenceId: order.referenceId,
+          loanAmountDisplay: order.loanAmountDisplay,
+          imageUrl: order.imageUrl,
+          dueDateMs: order.dueDateMs,
+          createdAt: order.createdAt,
+        },
       },
     })
-  }, [isDemo, navigate, order.id])
+  }, [isDemo, navigate, order])
 
   const isPending = variant === 'pending'
 
