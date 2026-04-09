@@ -4,6 +4,8 @@ export const paths = {
   login: '/login',
   otp: '/otp',
   home: '/home',
+  homeOrders: '/home/orders',
+  homeProfile: '/home/profile',
   loans: '/loans',
   orders: '/orders',
   payment: '/payment',

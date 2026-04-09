@@ -6,11 +6,12 @@ import { paths } from '@/routes/paths'
 const SplashPage = lazy(() => import('@/pages/SplashPage'))
 const LoginPage = lazy(() => import('@/pages/LoginPage'))
 const OtpPage = lazy(() => import('@/pages/OtpPage'))
-const HomePage = lazy(() => import('@/pages/HomePage'))
+const HomeLayout = lazy(() => import('@/layouts/HomeLayout'))
+const HomeDashboard = lazy(() => import('@/pages/home/HomeDashboard'))
+const HomeOrdersPanel = lazy(() => import('@/pages/home/HomeOrdersPanel'))
+const HomeProfilePanel = lazy(() => import('@/pages/home/HomeProfilePanel'))
 const LoansPage = lazy(() => import('@/pages/LoansPage'))
-const OrdersPage = lazy(() => import('@/pages/OrdersPage'))
 const PaymentPage = lazy(() => import('@/pages/PaymentPage'))
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'))
 
 export default function App() {
   return (
@@ -19,11 +20,21 @@ export default function App() {
         <Route path={paths.splash} element={<SplashPage />} />
         <Route path={paths.login} element={<LoginPage />} />
         <Route path={paths.otp} element={<OtpPage />} />
-        <Route path={paths.home} element={<HomePage />} />
+        <Route path={paths.home} element={<HomeLayout />}>
+          <Route index element={<HomeDashboard />} />
+          <Route path="orders" element={<HomeOrdersPanel />} />
+          <Route path="profile" element={<HomeProfilePanel />} />
+        </Route>
+        <Route
+          path={paths.orders}
+          element={<Navigate to={paths.homeOrders} replace />}
+        />
+        <Route
+          path={paths.profile}
+          element={<Navigate to={paths.homeProfile} replace />}
+        />
         <Route path={paths.loans} element={<LoansPage />} />
-        <Route path={paths.orders} element={<OrdersPage />} />
         <Route path={paths.payment} element={<PaymentPage />} />
-        <Route path={paths.profile} element={<ProfilePage />} />
         <Route path="*" element={<Navigate to={paths.splash} replace />} />
       </Routes>
     </Suspense>
