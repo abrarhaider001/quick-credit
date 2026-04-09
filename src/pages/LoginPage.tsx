@@ -10,7 +10,8 @@ export default function LoginPage() {
   const cached = useMemo(() => readCachedAuth(), [])
   const [fullName, setFullName] = useState(cached.fullName)
   const [phoneDigits, setPhoneDigits] = useState(cached.phoneDigits)
-  const [isNameFocused, setIsNameFocused] = useState(false)
+  // const [isNameFocused, setIsNameFocused] = useState(false)
+  // const [setIsNameFocused] = useState(false)
   const [isPhoneFocused, setIsPhoneFocused] = useState(false)
 
   const maskedPhone = useMemo(() => {
@@ -59,12 +60,12 @@ export default function LoginPage() {
                 value={fullName}
                 maxLength={20}
                 onChange={(e) => setFullName(e.target.value.slice(0, 20))}
-                onFocus={() => setIsNameFocused(true)}
-                onBlur={() => setIsNameFocused(false)}
+              // onFocus={() => setIsNameFocused(true)}
+              // onBlur={() => setIsNameFocused(false)}
               />
-              {isNameFocused ? (
+              {/* {isNameFocused ? (
                 <span className="login-field__meta">{fullName.length}/20</span>
-              ) : null}
+              ) : null} */}
             </label>
 
             <label className="login-field">
