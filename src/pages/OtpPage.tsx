@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { FiClock, FiShield } from 'react-icons/fi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Snackbar } from '@/components/ui/Snackbar'
+import { readCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask } from '@/lib/phone'
 import { paths } from '@/routes/paths'
 import { isLoginToOtpState } from '@/types/navigation'
@@ -28,11 +29,18 @@ export default function OtpPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const cached = useMemo(() => readCachedAuth(), [])
+  const fullName = useMemo(() => {
+    const st = location.state
+    if (isLoginToOtpState(st) && st.fullName.trim()) return st.fullName.trim()
+    return cached.fullName.trim()
+  }, [cached.fullName, location.state])
+
   const phoneDigits = useMemo(() => {
     const st = location.state
     if (isLoginToOtpState(st)) return st.phoneDigits.replace(/\D/g, '')
-    return ''
-  }, [location.state])
+    return cached.phoneDigits
+  }, [cached.phoneDigits, location.state])
 
   const [otp, setOtp] = useState<string[]>(() => Array(OTP_LEN).fill(''))
   const [phase, setPhase] = useState<'waiting' | 'filling' | 'done'>('waiting')
@@ -139,6 +147,11 @@ export default function OtpPage() {
           </div>
           <h1 className="otp-title">Verification Code</h1>
           <p className="otp-instruction">
+            {fullName ? (
+              <>
+                Hi <strong className="otp-phone">{fullName}</strong>,{' '}
+              </>
+            ) : null}
             Please enter the 6-digit code sent to{' '}
             <strong className="otp-phone">{displayPhone}</strong>
           </p>

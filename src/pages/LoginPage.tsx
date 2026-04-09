@@ -1,13 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiArrowRight, FiShield } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
+import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask } from '@/lib/phone'
 import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
-  const [fullName, setFullName] = useState('')
-  const [phoneDigits, setPhoneDigits] = useState('')
+  const cached = useMemo(() => readCachedAuth(), [])
+  const [fullName, setFullName] = useState(cached.fullName)
+  const [phoneDigits, setPhoneDigits] = useState(cached.phoneDigits)
   const [isNameFocused, setIsNameFocused] = useState(false)
   const [isPhoneFocused, setIsPhoneFocused] = useState(false)
 
@@ -20,6 +22,10 @@ export default function LoginPage() {
     const onlyDigits = value.replace(/\D/g, '').slice(0, 10)
     setPhoneDigits(onlyDigits)
   }
+
+  useEffect(() => {
+    writeCachedAuth({ fullName, phoneDigits })
+  }, [fullName, phoneDigits])
 
   return (
     <motion.main
@@ -88,6 +94,7 @@ export default function LoginPage() {
             <Link
               to={paths.otp}
               state={{
+                fullName,
                 phoneDigits,
                 phoneDisplay: formatPhoneLoginMask(phoneDigits),
               }}
