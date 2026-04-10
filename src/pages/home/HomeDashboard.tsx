@@ -5,12 +5,12 @@ import { HomeLimitsRow } from '@/components/home/HomeLimitsRow'
 import { HomeOfferBanner } from '@/components/home/HomeOfferBanner'
 import { Snackbar } from '@/components/ui/Snackbar'
 import { RECOMMENDED_LOANS } from '@/data/recommendedLoans'
-import { readCachedAuth } from '@/lib/authCache'
+import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
+import { useOrders } from '@/hooks/useOrders'
 import { tryApplyLoan } from '@/lib/ordersStore'
 
-const CREDIT_MIN = 2000
-const CREDIT_MAX = 34500
-const CREDIT_USED = 34500
+const FALLBACK_MIN = 2000
+const FALLBACK_MAX = 34500
 const PRE_APPROVED_ELIGIBLE = 50000
 
 /** Hero art — growth / coins (Unsplash) */
@@ -33,7 +33,21 @@ function displayFirstName(fullName: string): string {
 }
 
 export default function HomeDashboard() {
-  const userName = useMemo(() => displayFirstName(readCachedAuth().fullName), [])
+  const auth = useAuthCacheListener()
+  const { orders } = useOrders()
+
+  const minLimit = auth.minLimit != null && auth.minLimit > 0 ? auth.minLimit : FALLBACK_MIN
+  const maxLimit = auth.maxLimit != null && auth.maxLimit > 0 ? auth.maxLimit : FALLBACK_MAX
+
+  const usedCredit = useMemo(
+    () =>
+      orders
+        .filter((o) => o.status === 'pending')
+        .reduce((sum, o) => sum + (o.totalDueAmountNum ?? 0), 0),
+    [orders],
+  )
+
+  const userName = useMemo(() => displayFirstName(auth.fullName), [auth.fullName])
   const greet = useMemo(() => greetingLabel(), [])
 
   const [snackbar, setSnackbar] = useState<{
@@ -86,11 +100,7 @@ export default function HomeDashboard() {
         </p>
       </header>
 
-      <HomeCreditGaugeMobile
-        min={CREDIT_MIN}
-        max={CREDIT_MAX}
-        used={CREDIT_USED}
-      />
+      <HomeCreditGaugeMobile min={minLimit} max={maxLimit} used={usedCredit} />
 
       <HomeOfferBanner
         eyebrow="Personalized offer"
@@ -102,11 +112,7 @@ export default function HomeDashboard() {
         onCtaClick={scrollToRecommended}
       />
 
-      <HomeLimitsRow
-        minAmount={CREDIT_MIN}
-        maxAmount={CREDIT_MAX}
-        usedAmount={CREDIT_USED}
-      />
+      <HomeLimitsRow minAmount={minLimit} maxAmount={maxLimit} usedAmount={usedCredit} />
 
       <section
         className="home-loans"

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Snackbar } from '@/components/ui/Snackbar'
 import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask, toIndiaE164FromDigits } from '@/lib/phone'
-import { lookupUserDocumentIdByPhone } from '@/lib/userLookup'
+import { LOGIN_INVALID_PHONE_MESSAGE, validateLoginPhone } from '@/lib/validateLoginPhone'
 import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
@@ -13,11 +13,12 @@ export default function LoginPage() {
   const cached = useMemo(() => readCachedAuth(), [])
   const [phoneDigits, setPhoneDigits] = useState(cached.phoneDigits)
   const [isPhoneFocused, setIsPhoneFocused] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [snackbar, setSnackbar] = useState<{
     open: boolean
     message: string
     variant: 'error' | 'info' | 'success'
-  }>({ open: false, message: '', variant: 'info' })
+  }>({ open: false, message: '', variant: 'error' })
 
   const closeSnackbar = useCallback(() => {
     setSnackbar((s) => ({ ...s, open: false }))
@@ -33,62 +34,58 @@ export default function LoginPage() {
     setPhoneDigits(onlyDigits)
   }
 
+  /** Persist phone; omit userId/limits so returning to login clears the home session gate. */
   useEffect(() => {
-    writeCachedAuth({ fullName: '', phoneDigits })
-  }, [phoneDigits])
-
-  const goToOtp = useCallback(() => {
-    navigate(paths.otp, {
-      state: {
-        phoneDigits,
-        phoneDisplay: formatPhoneLoginMask(phoneDigits),
-      },
+    const c = readCachedAuth()
+    writeCachedAuth({
+      fullName: c.fullName,
+      phoneDigits,
     })
-  }, [navigate, phoneDigits])
+  }, [phoneDigits])
 
   const handleContinue = async () => {
     if (phoneDigits.length !== 10) {
-      goToOtp()
+      setSnackbar({
+        open: true,
+        variant: 'error',
+        message: LOGIN_INVALID_PHONE_MESSAGE,
+      })
       return
     }
 
     const e164 = toIndiaE164FromDigits(phoneDigits)
     if (!e164) {
-      goToOtp()
-      return
-    }
-
-    const result = await lookupUserDocumentIdByPhone(e164)
-
-    if (result.status === 'found') {
-      setSnackbar({
-        open: true,
-        variant: 'success',
-        message: `User found. Document ID: ${result.userId}`,
-      })
-      window.setTimeout(goToOtp, 2800)
-      return
-    }
-
-    if (result.status === 'not_found') {
-      setSnackbar({
-        open: true,
-        variant: 'info',
-        message: 'No user registered with this phone number.',
-      })
-    } else if (result.status === 'no_config') {
       setSnackbar({
         open: true,
         variant: 'error',
-        message: 'Firebase is not configured. Check your environment variables.',
+        message: LOGIN_INVALID_PHONE_MESSAGE,
       })
-    } else {
+      return
+    }
+
+    setSubmitting(true)
+    const result = await validateLoginPhone(e164)
+    setSubmitting(false)
+
+    if (!result.ok) {
       setSnackbar({
         open: true,
         variant: 'error',
-        message: result.message,
+        message: LOGIN_INVALID_PHONE_MESSAGE,
       })
+      return
     }
+
+    navigate(paths.otp, {
+      state: {
+        phoneDigits,
+        phoneDisplay: formatPhoneLoginMask(phoneDigits),
+        expectedUid: result.userId,
+        fullName: result.fullName,
+        minLimit: result.minLimit,
+        maxLimit: result.maxLimit,
+      },
+    })
   }
 
   return (
@@ -139,7 +136,8 @@ export default function LoginPage() {
             <button
               type="button"
               className="qc-btn qc-btn--primary login-continue"
-              onClick={handleContinue}
+              onClick={() => void handleContinue()}
+              disabled={submitting}
             >
               Continue <FiArrowRight size={16} />
             </button>

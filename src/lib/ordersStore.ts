@@ -13,9 +13,20 @@ export type LoanOrder = {
   dueDateMs?: number
   loanAmountDisplay?: string
   clearedAt?: number
+  /** From Firestore `orders.paymentUrl` */
+  paymentUrl?: string
+  /** Numeric due for dashboards (Firestore `totalDueAmount`) */
+  totalDueAmountNum?: number
 }
 
 const ORDERS_KEY = 'quickcredit.orders.v1'
+
+/** When `userId` is in auth cache, UI reads orders from Firestore via this snapshot. */
+let firestoreOrdersSnapshot: LoanOrder[] | null = null
+
+export function setFirestoreOrdersSnapshot(orders: LoanOrder[] | null): void {
+  firestoreOrdersSnapshot = orders
+}
 
 function readRaw(): LoanOrder[] {
   if (typeof window === 'undefined') return []
@@ -46,6 +57,9 @@ function writeRaw(orders: LoanOrder[]) {
 }
 
 export function getOrders(): LoanOrder[] {
+  if (firestoreOrdersSnapshot !== null) {
+    return firestoreOrdersSnapshot
+  }
   return readRaw()
 }
 

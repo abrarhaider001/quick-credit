@@ -13,6 +13,8 @@ export type PaymentLoanSnapshot = {
   imageUrl?: string
   dueDateMs?: number
   createdAt?: number
+  /** Firestore `orders.paymentUrl` when present */
+  paymentUrl?: string
 }
 
 export type PaymentLocationState = {
@@ -41,6 +43,7 @@ function snapshotToOrder(s: PaymentLoanSnapshot): LoanOrder {
     totalToPay: s.totalToPay,
     dueDateMs: s.dueDateMs,
     loanAmountDisplay: s.loanAmountDisplay,
+    paymentUrl: s.paymentUrl,
   }
 }
 

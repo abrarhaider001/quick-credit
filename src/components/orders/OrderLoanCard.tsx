@@ -40,6 +40,7 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
           imageUrl: order.imageUrl,
           dueDateMs: order.dueDateMs,
           createdAt: order.createdAt,
+          paymentUrl: order.paymentUrl,
         },
       },
     })

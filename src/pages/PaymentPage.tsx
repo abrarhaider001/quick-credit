@@ -191,6 +191,24 @@ export default function PaymentPage() {
                 </p>
               ) : null}
 
+              {loan?.paymentUrl ? (
+                <section className="payment-page__loan-link" aria-label="Loan payment link">
+                  <h2 className="payment-page__step-title">Loan payment link</h2>
+                  <p className="payment-page__step-desc">
+                    Use this link to complete payment for this loan in your lender&apos;s portal.
+                  </p>
+                  <a
+                    className="payment-page__external-pay"
+                    href={loan.paymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open payment page
+                    <FiArrowRight size={18} strokeWidth={2.25} aria-hidden />
+                  </a>
+                </section>
+              ) : null}
+
               <section className="payment-page__summary" aria-label="Amount due">
                 <div className="payment-page__summary-mobile">
                   <p className="payment-page__summary-label">Total Pending Amount</p>

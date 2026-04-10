@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom'
 import { FiHome, FiPackage, FiShield, FiUser } from 'react-icons/fi'
+import { Navigate, NavLink, Outlet } from 'react-router-dom'
+import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
 import { paths } from '@/routes/paths'
 
 const tabs = [
@@ -9,6 +10,11 @@ const tabs = [
 ] as const
 
 export default function HomeLayout() {
+  const auth = useAuthCacheListener()
+  if (!auth.userId) {
+    return <Navigate to={paths.login} replace />
+  }
+
   return (
     <div className="home-app">
       <aside className="home-sidebar" aria-label="Main navigation">

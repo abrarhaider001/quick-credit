@@ -80,19 +80,7 @@ service cloud.firestore {
         && (!('defaultInterestRate' in s) || s.defaultInterestRate is number);
     }
 
-    // Phone lookup queries (where('phone','==', e164)): any client may list docs that match this borrower shape.
-    // Must stay in sync with app (E.164 +91…). Admins in this collection still block a full unfiltered list.
-    function userRowForPublicPhoneQuery() {
-      return resource.data.role == 'user'
-        && resource.data.isBlocked == false
-        && resource.data.phone is string
-        && resource.data.phone.matches('^\\+[1-9][0-9]{6,14}$');
-    }
-
     match /users/{userId} {
-      // allow get: if isAdmin() || isOwner(userId);
-      // allow list: if isAdmin() || isOwner(userId) || userRowForPublicPhoneQuery();
-
       allow read, get, list: if true;
 
       allow create: if (isAdmin() && userDocumentShape())
@@ -109,9 +97,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    /**
+     * Client lists orders by userId without Firebase Auth (phone-only demo login).
+     * Tighten to signedIn() + resource.data.userId == request.auth.uid when you add real auth.
+     */
     match /orders/{orderId} {
-      allow read: if isAdmin()
-        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow read: if true;
 
       allow create: if isAdmin() && orderDocumentShape();
 
@@ -120,8 +111,10 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    /** Login gate: read blocked list (doc id and/or `phone` field). Writes admin-only. */
     match /blocked_users/{docId} {
-      allow read, write: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /admin_settings/{docId} {

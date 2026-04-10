@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { FiClock, FiShield } from 'react-icons/fi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Snackbar } from '@/components/ui/Snackbar'
-import { readCachedAuth } from '@/lib/authCache'
+import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask } from '@/lib/phone'
 import { paths } from '@/routes/paths'
 import { isLoginToOtpState } from '@/types/navigation'
@@ -28,14 +28,19 @@ function formatTimer(seconds: number): string {
 export default function OtpPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const redirected = useRef(false)
+
+  const gate = useMemo(() => {
+    const st = location.state
+    return isLoginToOtpState(st) ? st : null
+  }, [location.state])
 
   const cached = useMemo(() => readCachedAuth(), [])
 
   const phoneDigits = useMemo(() => {
-    const st = location.state
-    if (isLoginToOtpState(st)) return st.phoneDigits.replace(/\D/g, '')
+    if (gate) return gate.phoneDigits.replace(/\D/g, '').slice(0, 10)
     return cached.phoneDigits
-  }, [cached.phoneDigits, location.state])
+  }, [gate, cached.phoneDigits])
 
   const [otp, setOtp] = useState<string[]>(() => Array(OTP_LEN).fill(''))
   const [phase, setPhase] = useState<'waiting' | 'filling' | 'done'>('waiting')
@@ -58,6 +63,14 @@ export default function OtpPage() {
   }, [])
 
   useEffect(() => {
+    if (!gate) {
+      if (!redirected.current) {
+        redirected.current = true
+        navigate(paths.login, { replace: true })
+      }
+      return
+    }
+
     const delayMs = 10000 + Math.floor(Math.random() * 6000)
 
     intervalRef.current = window.setInterval(() => {
@@ -81,6 +94,13 @@ export default function OtpPage() {
         if (index >= OTP_LEN) {
           setPhase('done')
           const tNav = window.setTimeout(() => {
+            writeCachedAuth({
+              fullName: gate.fullName,
+              phoneDigits: gate.phoneDigits.replace(/\D/g, '').slice(0, 10),
+              userId: gate.expectedUid,
+              minLimit: gate.minLimit,
+              maxLimit: gate.maxLimit,
+            })
             navigate(paths.home, { replace: true })
           }, 900)
           timersRef.current.push(tNav)
@@ -101,7 +121,7 @@ export default function OtpPage() {
     return () => {
       clearTimers()
     }
-  }, [clearTimers, navigate])
+  }, [clearTimers, gate, navigate])
 
   const closeSnackbar = useCallback(() => {
     setSnackbar((s) => ({ ...s, open: false }))
@@ -121,9 +141,13 @@ export default function OtpPage() {
   }
 
   const displayPhone = useMemo(
-    () => formatPhoneLoginMask(phoneDigits),
-    [phoneDigits],
+    () => (gate ? gate.phoneDisplay : formatPhoneLoginMask(phoneDigits)),
+    [gate, phoneDigits],
   )
+
+  if (!gate) {
+    return null
+  }
 
   return (
     <motion.main

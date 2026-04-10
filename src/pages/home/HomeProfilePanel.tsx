@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { clearCachedAuth, readCachedAuth } from '@/lib/authCache'
+import { setFirestoreOrdersSnapshot } from '@/lib/ordersStore'
 import {
   DEMO_BANK_ACCOUNT_DIGITS,
   formatBankAccountFull,
@@ -102,6 +103,7 @@ export default function HomeProfilePanel() {
   )
 
   const logout = useCallback(() => {
+    setFirestoreOrdersSnapshot(null)
     clearCachedAuth()
     navigate(paths.login, { replace: true })
   }, [navigate])

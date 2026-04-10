@@ -3,13 +3,21 @@ import { useMemo, useState } from 'react'
 import { FiCheckCircle, FiInfo, FiSearch } from 'react-icons/fi'
 import { OrderLoanCard } from '@/components/orders/OrderLoanCard'
 import { DEMO_COMPLETED, DEMO_PENDING } from '@/data/ordersDemo'
+import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
 import { useOrders } from '@/hooks/useOrders'
 import { enrichOrder } from '@/lib/orderDisplay'
 import type { EnrichedLoanOrder } from '@/lib/orderDisplay'
 import type { LoanOrder } from '@/lib/ordersStore'
 type Tab = 'pending' | 'completed'
 
-function splitOrders(orders: LoanOrder[]) {
+function splitOrders(orders: LoanOrder[], signedInWithUserId: boolean) {
+  if (signedInWithUserId) {
+    return {
+      pending: orders.filter((o) => o.status === 'pending').map(enrichOrder),
+      completed: orders.filter((o) => o.status === 'cleared').map(enrichOrder),
+      useDemo: false,
+    }
+  }
   const useDemo = orders.length === 0
   const pendingSrc = useDemo ? DEMO_PENDING : orders.filter((o) => o.status === 'pending')
   const completedSrc = useDemo
@@ -35,13 +43,14 @@ function filterList(list: EnrichedLoanOrder[], q: string) {
 }
 
 export default function HomeOrdersPanel() {
+  const auth = useAuthCacheListener()
   const { orders } = useOrders()
   const [tab, setTab] = useState<Tab>('pending')
   const [search, setSearch] = useState('')
 
   const { pending, completed, useDemo } = useMemo(
-    () => splitOrders(orders),
-    [orders],
+    () => splitOrders(orders, Boolean(auth.userId)),
+    [orders, auth.userId],
   )
 
   const list = tab === 'pending' ? pending : completed

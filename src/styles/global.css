@@ -1184,6 +1184,29 @@ a:hover {
   color: #6b7280;
 }
 
+.payment-page__loan-link {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(59, 130, 246, 0.06));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.payment-page__external-pay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.payment-page__external-pay:hover {
+  text-decoration: underline;
+}
+
 .payment-page__form {
   display: flex;
   flex-direction: column;
