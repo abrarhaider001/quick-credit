@@ -40,3 +40,13 @@ export function writeCachedAuth(value: CachedAuth): void {
     // Ignore storage failures.
   }
 }
+
+/** Clears stored session (name / phone) — used on logout. */
+export function clearCachedAuth(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(AUTH_CACHE_KEY)
+  } catch {
+    // ignore
+  }
+}
