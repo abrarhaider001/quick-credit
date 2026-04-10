@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import { FiChevronDown } from 'react-icons/fi'
 import { HomeCreditGaugeMobile } from '@/components/home/HomeCreditGaugeMobile'
 import { HomeDashboardFooter } from '@/components/home/HomeDashboardFooter'
 import { HomeLimitsRow } from '@/components/home/HomeLimitsRow'
@@ -40,7 +39,7 @@ export default function HomeDashboard() {
   const [snackbar, setSnackbar] = useState<{
     open: boolean
     message: string
-    variant: 'error' | 'info'
+    variant: 'error' | 'info' | 'success'
   }>({ open: false, message: '', variant: 'info' })
 
   const closeSnackbar = useCallback(() => {
@@ -56,15 +55,15 @@ export default function HomeDashboard() {
       if (result === 'dues') {
         setSnackbar({
           open: true,
-          message: 'Please clear previous dues',
+          message: 'Pay your previous dues',
           variant: 'error',
         })
         return
       }
       setSnackbar({
         open: true,
-        message: 'Processing...',
-        variant: 'info',
+        message: 'Processing successful',
+        variant: 'success',
       })
     },
     [],
@@ -122,13 +121,7 @@ export default function HomeDashboard() {
         </div>
         <div className="home-loans__list">
           {RECOMMENDED_LOANS.map((loan) => (
-            <button
-              key={loan.id}
-              type="button"
-              className="loan-tile"
-              aria-label={`${loan.name}, ${loan.displayFigure}. Loan amount.`}
-              onClick={() => onApply(loan)}
-            >
+            <article key={loan.id} className="loan-tile" aria-label={`${loan.name}, ${loan.displayFigure}`}>
               <div className="loan-tile__thumb">
                 <img
                   src={loan.image}
@@ -139,15 +132,19 @@ export default function HomeDashboard() {
               </div>
               <div className="loan-tile__main">
                 <h3 className="loan-tile__name">{loan.name}</h3>
-                <p className="loan-tile__eyebrow">Loan amount</p>
+                <p className="loan-tile__figure">{loan.displayFigure}</p>
               </div>
               <div className="loan-tile__side">
-                <span className="loan-tile__chev" aria-hidden>
-                  <FiChevronDown size={18} strokeWidth={2} />
-                </span>
-                <span className="loan-tile__figure">{loan.displayFigure}</span>
+                <button
+                  type="button"
+                  className="loan-tile__apply"
+                  onClick={() => onApply(loan)}
+                  aria-label={`Apply for ${loan.name}`}
+                >
+                  Apply
+                </button>
               </div>
-            </button>
+            </article>
           ))}
         </div>
       </section>
