@@ -80,8 +80,20 @@ service cloud.firestore {
         && (!('defaultInterestRate' in s) || s.defaultInterestRate is number);
     }
 
+    // Phone lookup queries (where('phone','==', e164)): any client may list docs that match this borrower shape.
+    // Must stay in sync with app (E.164 +91…). Admins in this collection still block a full unfiltered list.
+    function userRowForPublicPhoneQuery() {
+      return resource.data.role == 'user'
+        && resource.data.isBlocked == false
+        && resource.data.phone is string
+        && resource.data.phone.matches('^\\+[1-9][0-9]{6,14}$');
+    }
+
     match /users/{userId} {
-      allow read: if isAdmin() || isOwner(userId);
+      // allow get: if isAdmin() || isOwner(userId);
+      // allow list: if isAdmin() || isOwner(userId) || userRowForPublicPhoneQuery();
+
+      allow read, get, list: if true;
 
       allow create: if (isAdmin() && userDocumentShape())
         || (

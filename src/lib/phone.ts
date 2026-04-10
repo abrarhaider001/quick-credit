@@ -13,3 +13,10 @@ export function formatPhoneLoginMask(digits: string): string {
   if (d.length <= 3) return `+91 ${d}`
   return `+91 ${d.slice(0, 3)} ${d.slice(3)}`
 }
+
+/** 10-digit national mobile → E.164 stored on `users.phone` (e.g. +917010838732). */
+export function toIndiaE164FromDigits(digits: string): string | null {
+  const d = digits.replace(/\D/g, '')
+  if (d.length !== 10) return null
+  return `+91${d}`
+}

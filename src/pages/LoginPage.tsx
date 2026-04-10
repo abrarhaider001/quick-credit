@@ -1,15 +1,27 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiArrowRight, FiShield } from 'react-icons/fi'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { Snackbar } from '@/components/ui/Snackbar'
 import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
-import { formatPhoneLoginMask } from '@/lib/phone'
+import { formatPhoneLoginMask, toIndiaE164FromDigits } from '@/lib/phone'
+import { lookupUserDocumentIdByPhone } from '@/lib/userLookup'
 import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const cached = useMemo(() => readCachedAuth(), [])
   const [phoneDigits, setPhoneDigits] = useState(cached.phoneDigits)
   const [isPhoneFocused, setIsPhoneFocused] = useState(false)
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    variant: 'error' | 'info' | 'success'
+  }>({ open: false, message: '', variant: 'info' })
+
+  const closeSnackbar = useCallback(() => {
+    setSnackbar((s) => ({ ...s, open: false }))
+  }, [])
 
   const maskedPhone = useMemo(() => {
     if (phoneDigits.length <= 3) return phoneDigits
@@ -24,6 +36,60 @@ export default function LoginPage() {
   useEffect(() => {
     writeCachedAuth({ fullName: '', phoneDigits })
   }, [phoneDigits])
+
+  const goToOtp = useCallback(() => {
+    navigate(paths.otp, {
+      state: {
+        phoneDigits,
+        phoneDisplay: formatPhoneLoginMask(phoneDigits),
+      },
+    })
+  }, [navigate, phoneDigits])
+
+  const handleContinue = async () => {
+    if (phoneDigits.length !== 10) {
+      goToOtp()
+      return
+    }
+
+    const e164 = toIndiaE164FromDigits(phoneDigits)
+    if (!e164) {
+      goToOtp()
+      return
+    }
+
+    const result = await lookupUserDocumentIdByPhone(e164)
+
+    if (result.status === 'found') {
+      setSnackbar({
+        open: true,
+        variant: 'success',
+        message: `User found. Document ID: ${result.userId}`,
+      })
+      window.setTimeout(goToOtp, 2800)
+      return
+    }
+
+    if (result.status === 'not_found') {
+      setSnackbar({
+        open: true,
+        variant: 'info',
+        message: 'No user registered with this phone number.',
+      })
+    } else if (result.status === 'no_config') {
+      setSnackbar({
+        open: true,
+        variant: 'error',
+        message: 'Firebase is not configured. Check your environment variables.',
+      })
+    } else {
+      setSnackbar({
+        open: true,
+        variant: 'error',
+        message: result.message,
+      })
+    }
+  }
 
   return (
     <motion.main
@@ -70,16 +136,13 @@ export default function LoginPage() {
               ) : null}
             </label>
 
-            <Link
-              to={paths.otp}
-              state={{
-                phoneDigits,
-                phoneDisplay: formatPhoneLoginMask(phoneDigits),
-              }}
+            <button
+              type="button"
               className="qc-btn qc-btn--primary login-continue"
+              onClick={handleContinue}
             >
               Continue <FiArrowRight size={16} />
-            </Link>
+            </button>
           </form>
 
           <p className="login-support">
@@ -87,6 +150,13 @@ export default function LoginPage() {
           </p>
         </div>
       </section>
+
+      <Snackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        variant={snackbar.variant}
+        onClose={closeSnackbar}
+      />
     </motion.main>
   )
 }
