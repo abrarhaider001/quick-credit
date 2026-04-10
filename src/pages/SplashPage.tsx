@@ -1,13 +1,46 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiShield } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import { Snackbar } from '@/components/ui/Snackbar'
+import { logFirebaseConnectionResult, testFirebaseConnection } from '@/lib/firebaseConnectionTest'
 import { paths } from '@/routes/paths'
 
 export default function SplashPage() {
   const navigate = useNavigate()
   const [isExiting, setIsExiting] = useState(false)
   const splashDelay = useMemo(() => 4000, [])
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    variant: 'success' | 'error'
+  }>({ open: false, message: '', variant: 'success' })
+
+  const closeSnackbar = useCallback(() => {
+    setSnackbar((s) => ({ ...s, open: false }))
+  }, [])
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      window.testQuickCreditFirebase = testFirebaseConnection
+    }
+
+    let cancelled = false
+    void testFirebaseConnection().then((result) => {
+      logFirebaseConnectionResult(result)
+      if (cancelled) return
+      setSnackbar({
+        open: true,
+        message: result.message,
+        variant: result.ok ? 'success' : 'error',
+      })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     const startExit = window.setTimeout(() => {
@@ -65,6 +98,13 @@ export default function SplashPage() {
           </p>
         </div>
       </motion.div>
+
+      <Snackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        variant={snackbar.variant}
+        onClose={closeSnackbar}
+      />
     </motion.main>
   )
 }
