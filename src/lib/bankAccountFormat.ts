@@ -25,3 +25,10 @@ export function formatBankAccountHideFirstGroup(digits: string): string {
   const tail = formatBankAccountFull(rest)
   return tail ? `•••• ${tail}` : '••••'
 }
+
+/** e.g. "**** **** **** 8842" — only last four digits visible */
+export function formatBankAccountMaskedLast4(digits: string): string {
+  const d = digits.replace(/\D/g, '')
+  const last4 = d.slice(-4).padStart(4, '0')
+  return `**** **** **** ${last4.slice(-4)}`
+}

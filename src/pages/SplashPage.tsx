@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FiLock } from 'react-icons/fi'
+import { FiShield } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { paths } from '@/routes/paths'
 
@@ -30,42 +30,41 @@ export default function SplashPage() {
       initial={{ opacity: 0 }}
       animate={{
         opacity: isExiting ? 0 : 1,
-        y: isExiting ? -16 : 0,
+        y: isExiting ? -8 : 0,
       }}
-      transition={{ duration: isExiting ? 0.4 : 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: isExiting ? 0.4 : 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="splash-screen__content">
+      <motion.div
+        className="splash-screen__content"
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="splash-bg-block splash-bg-block--one" aria-hidden />
         <div className="splash-bg-block splash-bg-block--two" aria-hidden />
         <div className="splash-bg-block splash-bg-block--three" aria-hidden />
 
-        <motion.div
-          className="splash-logo"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          aria-hidden
-        >
-          <span className="splash-logo__mark">
+        <br /><br />
+        <div className="splash-logo">
+          <div className="splash-logo__mark" aria-hidden>
             <span />
             <span />
             <span />
-          </span>
-        </motion.div>
-
+          </div>
+        </div>
         <h1 className="splash-screen__title">QuickCredit</h1>
-        <p className="splash-screen__tagline">Fast &amp; Easy Credit Access</p>
+        <p className="splash-screen__tagline">Fast &amp; easy credit access</p>
 
         <div className="splash-loader" aria-label="Loading">
-          <span className="splash-loader__track">
+          <div className="splash-loader__track">
             <span className="splash-loader__pulse" />
-          </span>
-          <span className="splash-loader__secure">
-            <FiLock size={11} aria-hidden />
-            <span>Verified secure access</span>
-          </span>
+          </div>
+          <p className="splash-loader__secure">
+            <FiShield size={12} aria-hidden />
+            Bank-grade security
+          </p>
         </div>
-      </div>
+      </motion.div>
     </motion.main>
   )
 }

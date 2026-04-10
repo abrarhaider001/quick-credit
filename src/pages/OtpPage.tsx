@@ -30,11 +30,6 @@ export default function OtpPage() {
   const location = useLocation()
 
   const cached = useMemo(() => readCachedAuth(), [])
-  const fullName = useMemo(() => {
-    const st = location.state
-    if (isLoginToOtpState(st) && st.fullName.trim()) return st.fullName.trim()
-    return cached.fullName.trim()
-  }, [cached.fullName, location.state])
 
   const phoneDigits = useMemo(() => {
     const st = location.state
@@ -147,11 +142,6 @@ export default function OtpPage() {
           </div>
           <h1 className="otp-title">Verification Code</h1>
           <p className="otp-instruction">
-            {fullName ? (
-              <>
-                Hi <strong className="otp-phone">{fullName}</strong>,{' '}
-              </>
-            ) : null}
             Please enter the 6-digit code sent to{' '}
             <strong className="otp-phone">{displayPhone}</strong>
           </p>

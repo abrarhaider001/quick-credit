@@ -1,9 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import SplashPage from '@/pages/SplashPage'
 import { paths } from '@/routes/paths'
 
-const SplashPage = lazy(() => import('@/pages/SplashPage'))
 const LoginPage = lazy(() => import('@/pages/LoginPage'))
 const OtpPage = lazy(() => import('@/pages/OtpPage'))
 const HomeLayout = lazy(() => import('@/layouts/HomeLayout'))
@@ -15,7 +14,7 @@ const PaymentPage = lazy(() => import('@/pages/PaymentPage'))
 
 export default function App() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={null}>
       <Routes>
         <Route path={paths.splash} element={<SplashPage />} />
         <Route path={paths.login} element={<LoginPage />} />

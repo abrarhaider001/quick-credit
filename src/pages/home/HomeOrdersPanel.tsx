@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useMemo, useState } from 'react'
-import { FiInfo, FiSearch } from 'react-icons/fi'
+import { FiCheckCircle, FiInfo, FiSearch } from 'react-icons/fi'
 import { OrderLoanCard } from '@/components/orders/OrderLoanCard'
 import { DEMO_COMPLETED, DEMO_PENDING } from '@/data/ordersDemo'
 import { useOrders } from '@/hooks/useOrders'
@@ -123,13 +123,20 @@ export default function HomeOrdersPanel() {
           transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         >
           {filtered.length === 0 ? (
-            <p className="orders-page__empty">
-              {list.length === 0
-                ? tab === 'pending'
+            list.length === 0 && tab === 'completed' ? (
+              <div className="orders-page__empty orders-page__empty--completed">
+                <span className="orders-page__empty-icon" aria-hidden>
+                  <FiCheckCircle size={44} strokeWidth={1.75} />
+                </span>
+                <p className="orders-page__empty-text">No completed loans yet.</p>
+              </div>
+            ) : (
+              <p className="orders-page__empty">
+                {list.length === 0
                   ? 'No pending loans. Apply from the home tab.'
-                  : 'No completed loans yet.'
-                : 'No matches for your search.'}
-            </p>
+                  : 'No matches for your search.'}
+              </p>
+            )
           ) : (
             <ul className="orders-page__list">
               {filtered.map((o) => (
@@ -146,14 +153,16 @@ export default function HomeOrdersPanel() {
         </motion.div>
       </AnimatePresence>
 
-      <aside className="orders-page__note" role="note">
-        <span className="orders-page__note-icon" aria-hidden>
-          <FiInfo size={22} strokeWidth={2.25} />
-        </span>
-        <p className="orders-page__note-text">
-          On time payment can increase your credit limit and unlock premium loan rates.
-        </p>
-      </aside>
+      {tab === 'pending' ? (
+        <aside className="orders-page__note" role="note">
+          <span className="orders-page__note-icon" aria-hidden>
+            <FiInfo size={22} strokeWidth={2.25} />
+          </span>
+          <p className="orders-page__note-text">
+            On time payment can increase your credit limit and unlock premium loan rates.
+          </p>
+        </aside>
+      ) : null}
     </div>
   )
 }

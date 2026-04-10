@@ -8,10 +8,7 @@ import { paths } from '@/routes/paths'
 
 export default function LoginPage() {
   const cached = useMemo(() => readCachedAuth(), [])
-  const [fullName, setFullName] = useState(cached.fullName)
   const [phoneDigits, setPhoneDigits] = useState(cached.phoneDigits)
-  // const [isNameFocused, setIsNameFocused] = useState(false)
-  // const [setIsNameFocused] = useState(false)
   const [isPhoneFocused, setIsPhoneFocused] = useState(false)
 
   const maskedPhone = useMemo(() => {
@@ -25,8 +22,8 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    writeCachedAuth({ fullName, phoneDigits })
-  }, [fullName, phoneDigits])
+    writeCachedAuth({ fullName: '', phoneDigits })
+  }, [phoneDigits])
 
   return (
     <motion.main
@@ -51,24 +48,6 @@ export default function LoginPage() {
         <div className="login-card">
           <form className="login-form" onSubmit={(e) => e.preventDefault()}>
             <label className="login-field">
-              <span className="login-field__label">Full Name</span>
-              <input
-                className={`login-input ${fullName.length > 0 ? 'login-input--active' : ''}`}
-                type="text"
-                placeholder="e.g. Rahul Sharma"
-                autoComplete="name"
-                value={fullName}
-                maxLength={20}
-                onChange={(e) => setFullName(e.target.value.slice(0, 20))}
-              // onFocus={() => setIsNameFocused(true)}
-              // onBlur={() => setIsNameFocused(false)}
-              />
-              {/* {isNameFocused ? (
-                <span className="login-field__meta">{fullName.length}/20</span>
-              ) : null} */}
-            </label>
-
-            <label className="login-field">
               <span className="login-field__label">Phone Number</span>
               <div className={`login-phone ${phoneDigits.length > 0 ? 'login-phone--active' : ''}`}>
                 <span className="login-phone__code" aria-label="Country code">
@@ -86,7 +65,6 @@ export default function LoginPage() {
                   onBlur={() => setIsPhoneFocused(false)}
                 />
               </div>
-              {/* <span className="login-field__hint">Mask format: 123 4567891</span> */}
               {isPhoneFocused ? (
                 <span className="login-field__meta">{phoneDigits.length}/10</span>
               ) : null}
@@ -95,7 +73,6 @@ export default function LoginPage() {
             <Link
               to={paths.otp}
               state={{
-                fullName,
                 phoneDigits,
                 phoneDisplay: formatPhoneLoginMask(phoneDigits),
               }}
