@@ -17,7 +17,7 @@ const PRE_APPROVED_ELIGIBLE = 50000
 const OFFER_IMAGE =
   'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80'
 
-const RECOMMENDED_HEADLINE = '₹27,000'
+const RECOMMENDED_HEADLINE = '₹31,500'
 
 function greetingLabel(): string {
   const h = new Date().getHours()

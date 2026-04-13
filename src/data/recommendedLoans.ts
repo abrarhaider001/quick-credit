@@ -1,3 +1,7 @@
+import loan1Img from '@/assets/Loan1.jpeg'
+import loan2Img from '@/assets/Loan2.jpeg'
+import loan3Img from '@/assets/Loan3.jpeg'
+
 export type RecommendedLoan = {
   id: string
   name: string
@@ -12,29 +16,26 @@ export type RecommendedLoan = {
 export const RECOMMENDED_LOANS: RecommendedLoan[] = [
   {
     id: 'rl-1',
-    name: 'GrandLoan',
+    name: 'True Cash',
     displayFigure: '₹7,500',
-    amount: 'Up to ₹5,00,000',
-    image:
-      'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=80',
-    imageAlt: 'Coins and finance',
+    amount: 'Up to ₹7,500',
+    image: loan1Img,
+    imageAlt: 'True Cash',
   },
   {
     id: 'rl-2',
-    name: 'FlexMoney',
-    displayFigure: '₹12,000',
-    amount: 'Up to ₹2,00,000',
-    image:
-      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80',
-    imageAlt: 'Calculator and documents',
+    name: 'Cash Bee',
+    displayFigure: '₹9,500',
+    amount: 'Up to ₹9,500',
+    image: loan2Img,
+    imageAlt: 'Cash Bee',
   },
   {
     id: 'rl-3',
-    name: 'MoneySweet',
-    displayFigure: '₹15,000',
-    amount: 'Up to ₹10,00,000',
-    image:
-      'https://images.unsplash.com/photo-1554224154-26032cec0a0c?w=400&q=80',
-    imageAlt: 'Credit card and phone',
+    name: 'Tata Credit',
+    displayFigure: '₹14,500',
+    amount: 'Up to ₹14,500',
+    image: loan3Img,
+    imageAlt: 'Tata Credit',
   },
 ]
