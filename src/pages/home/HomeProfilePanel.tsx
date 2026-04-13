@@ -10,6 +10,8 @@ import {
   FiX,
 } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
+import { useFirestoreUserProfile } from '@/hooks/useFirestoreUserProfile'
 import { clearCachedAuth, readCachedAuth } from '@/lib/authCache'
 import { setFirestoreOrdersSnapshot } from '@/lib/ordersStore'
 import {
@@ -83,7 +85,10 @@ function CreditDonut({
 
 export default function HomeProfilePanel() {
   const navigate = useNavigate()
-  const auth = useMemo(() => readCachedAuth(), [])
+  const auth = useAuthCacheListener()
+  const { flags: userFlags } = useFirestoreUserProfile(auth.userId)
+  const showBankSection = userFlags.showBankAccount !== false
+
   const displayName = auth.fullName.trim() || '---'
   const maskedPhone = useMemo(() => maskPhoneDisplay(auth.phoneDigits), [auth.phoneDigits])
   const [activePanel, setActivePanel] = useState<'none' | 'support'>('none')
@@ -168,49 +173,51 @@ export default function HomeProfilePanel() {
             <CreditDonut className="profile-page__donut" compact utilPct={UTIL_PCT} />
           </section>
 
-          <section className="profile-page__bank" aria-label="Bank information">
-            <div className="profile-page__bank-head">
-              <p className="profile-page__bank-cap">Primary bank account</p>
-              <div className="profile-page__bank-trail">
-                <span className="profile-page__verified profile-page__verified--desktop">
-                  <FiCheck size={12} strokeWidth={3} aria-hidden />
-                  Verified
-                </span>
-                <button
-                  type="button"
-                  className="profile-page__eye-btn"
-                  onClick={() => setBankRevealFull((v) => !v)}
-                  aria-pressed={bankRevealFull}
-                  aria-label={bankRevealFull ? 'Mask account number' : 'Show full account number'}
-                >
-                  {bankRevealFull ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-                </button>
+          {showBankSection ? (
+            <section className="profile-page__bank" aria-label="Bank information">
+              <div className="profile-page__bank-head">
+                <p className="profile-page__bank-cap">Primary bank account</p>
+                <div className="profile-page__bank-trail">
+                  <span className="profile-page__verified profile-page__verified--desktop">
+                    <FiCheck size={12} strokeWidth={3} aria-hidden />
+                    Verified
+                  </span>
+                  <button
+                    type="button"
+                    className="profile-page__eye-btn"
+                    onClick={() => setBankRevealFull((v) => !v)}
+                    aria-pressed={bankRevealFull}
+                    aria-label={bankRevealFull ? 'Mask account number' : 'Show full account number'}
+                  >
+                    {bankRevealFull ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="profile-page__bank-body">
-              <div className="profile-page__bank-icon-wrap" aria-hidden>
-                <svg className="profile-page__bank-icon" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                  <path
-                    d="M3 10h18v10H3V10zm0-4h18v4H3V6zm9-3v3M7 21v-6m10 6v-6"
-                    stroke="currentColor"
-                    strokeWidth="1.75"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+              <div className="profile-page__bank-body">
+                <div className="profile-page__bank-icon-wrap" aria-hidden>
+                  <svg className="profile-page__bank-icon" viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <path
+                      d="M3 10h18v10H3V10zm0-4h18v4H3V6zm9-3v3M7 21v-6m10 6v-6"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <div className="profile-page__bank-details">
+                  <p className="profile-page__bank-label">Bank account number</p>
+                  <p
+                    className={`profile-page__bank-number${bankRevealFull ? ' profile-page__bank-number--tabular' : ''}`}
+                    dir="ltr"
+                  >
+                    {bankFormatted}
+                  </p>
+                  <p className="profile-page__bank-name profile-page__bank-name--desktop">{BANK_NAME}</p>
+                </div>
               </div>
-              <div className="profile-page__bank-details">
-                <p className="profile-page__bank-label">Bank account number</p>
-                <p
-                  className={`profile-page__bank-number${bankRevealFull ? ' profile-page__bank-number--tabular' : ''}`}
-                  dir="ltr"
-                >
-                  {bankFormatted}
-                </p>
-                <p className="profile-page__bank-name profile-page__bank-name--desktop">{BANK_NAME}</p>
-              </div>
-            </div>
-          </section>
+            </section>
+          ) : null}
 
           <nav className="profile-page__nav profile-page__nav--mobile" aria-label="Profile options">
             <button type="button" className="profile-page__nav-row" onClick={() => setActivePanel('support')}>

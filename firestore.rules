@@ -36,7 +36,8 @@ service cloud.firestore {
         && u.createdAt is timestamp
         && u.updatedAt is timestamp
         && u.loanSettings is map
-        && validLoanSettings(u.loanSettings);
+        && validLoanSettings(u.loanSettings)
+        && (!('showBankAccount' in u) || u.showBankAccount is bool);
     }
 
     function userSelfUpdateValid() {
@@ -46,7 +47,8 @@ service cloud.firestore {
         && after.role == before.role
         && after.phone == before.phone
         && after.isBlocked == before.isBlocked
-        && after.createdAt == before.createdAt;
+        && after.createdAt == before.createdAt
+        && after.showBankAccount == before.showBankAccount;
     }
 
     function orderDocumentShape() {
@@ -97,10 +99,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    /**
-     * Client lists orders by userId without Firebase Auth (phone-only demo login).
-     * Tighten to signedIn() + resource.data.userId == request.auth.uid when you add real auth.
-     */
     match /orders/{orderId} {
       allow read: if true;
 
@@ -115,7 +113,7 @@ service cloud.firestore {
     match /blocked_users/{docId} {
       allow read: if true;
       allow write: if isAdmin();
-    }
+		}
 
     match /admin_settings/{docId} {
       allow read: if isAdmin();

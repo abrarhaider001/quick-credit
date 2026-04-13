@@ -17,25 +17,24 @@ import { Snackbar } from '@/components/ui/Snackbar'
 import { formatDueDateWithOrdinal } from '@/lib/orderDisplay'
 import { paths } from '@/routes/paths'
 import { resolvePaymentLoan } from '@/types/paymentNavigation'
+import gpayImg from '@/assets/gpay-tbg.png'
+import paytmImg from '@/assets/paytm-tbg.png'
+import phonepeImg from '@/assets/phonepe-tbg.jpg'
+import upiImg from '@/assets/upi-tbg.webp'
 
 const DEMO_UPI_ID = 'quickcredit@upi'
 const SUPPORT_EMAIL = 'support@quickcredit.com'
 const SUPPORT_TEL_DISPLAY = '1800-000-0000'
 const SUPPORT_TEL_HREF = 'tel:+9118000000000'
 
-/** Add PNG/WebP files under public/assets/paymentMethods/ (e.g. paytm.png). */
 const PAYMENT_TILES = [
-  { id: 'paytm' as const, label: 'Paytm', file: 'paytm.png' },
-  { id: 'phonepe' as const, label: 'PhonePe', file: 'phonepe.png' },
-  { id: 'gpay' as const, label: 'Google Pay', file: 'googlepay.png' },
-  { id: 'upi' as const, label: 'Other UPI', file: 'upi.png' },
+  { id: 'paytm' as const, label: 'Paytm', src: paytmImg },
+  { id: 'phonepe' as const, label: 'PhonePe', src: phonepeImg },
+  { id: 'gpay' as const, label: 'Google Pay', src: gpayImg },
+  { id: 'upi' as const, label: 'Other UPI', src: upiImg },
 ]
 
 type MethodId = (typeof PAYMENT_TILES)[number]['id']
-
-function paymentMethodImageSrc(file: string): string {
-  return `/assets/paymentMethods/${file}`
-}
 
 function PaymentMethodTile({
   id,
@@ -274,12 +273,12 @@ export default function PaymentPage() {
                   </p>
                   <div className="payment-page__methods-wrap">
                     <div className="payment-page__method-grid" role="group" aria-label="UPI apps">
-                      {PAYMENT_TILES.map(({ id, label, file }) => (
+                      {PAYMENT_TILES.map(({ id, label, src }) => (
                         <PaymentMethodTile
                           key={id}
                           id={id}
                           label={label}
-                          imageSrc={paymentMethodImageSrc(file)}
+                          imageSrc={src}
                           selected={selectedMethod === id}
                           onSelect={setSelectedMethod}
                         />
