@@ -12,6 +12,13 @@ function formatInr(n: number): string {
   return `₹${n.toLocaleString('en-IN')}`
 }
 
+function parseLoanImageDataUrl(raw: unknown): string | undefined {
+  if (typeof raw !== 'string' || raw.length < 22) return undefined
+  const t = raw.trim()
+  if (!t.startsWith('data:image/') || !t.includes(';base64,')) return undefined
+  return t
+}
+
 /** Map Firestore `orders` document to app `LoanOrder`. */
 export function firestoreOrderToLoanOrder(docId: string, data: Record<string, unknown>): LoanOrder | null {
   if (typeof data.userId !== 'string' || typeof data.userName !== 'string') return null
@@ -20,6 +27,8 @@ export function firestoreOrderToLoanOrder(docId: string, data: Record<string, un
 
   const createdAt = tsToMs(data.createdAt)
   const dueDateMs = tsToMs(data.dueDate)
+
+  const loanImageDataUrl = parseLoanImageDataUrl(data.loanImageDataUrl)
 
   return {
     id: docId,
@@ -34,5 +43,6 @@ export function firestoreOrderToLoanOrder(docId: string, data: Record<string, un
     clearedAt: data.isCompleted ? tsToMs(data.updatedAt) : undefined,
     paymentUrl: typeof data.paymentUrl === 'string' ? data.paymentUrl : undefined,
     totalDueAmountNum: data.totalDueAmount,
+    ...(loanImageDataUrl ? { loanImageDataUrl } : {}),
   }
 }

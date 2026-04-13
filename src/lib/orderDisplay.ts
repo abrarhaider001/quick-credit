@@ -15,9 +15,16 @@ export function enrichOrder(o: LoanOrder): EnrichedLoanOrder {
   const due =
     o.dueDateMs ??
     o.createdAt + 14 * 24 * 60 * 60 * 1000
+  const fromFirestore =
+    typeof o.loanImageDataUrl === 'string' &&
+    o.loanImageDataUrl.startsWith('data:image/') &&
+    o.loanImageDataUrl.includes(';base64,')
+      ? o.loanImageDataUrl
+      : undefined
+  const imageUrl = fromFirestore ?? o.imageUrl ?? FALLBACK_IMG
   return {
     ...o,
-    imageUrl: o.imageUrl ?? FALLBACK_IMG,
+    imageUrl,
     referenceId: o.referenceId ?? `Ref: #${o.id.replace(/\W/g, '').slice(-8).toUpperCase()}`,
     totalToPay: o.totalToPay ?? o.amountLabel,
     dueDateMs: due,

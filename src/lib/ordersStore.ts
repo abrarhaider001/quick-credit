@@ -7,6 +7,8 @@ export type LoanOrder = {
   status: 'pending' | 'cleared'
   createdAt: number
   imageUrl?: string
+  /** Firestore `orders.loanImageDataUrl` — `data:image/...;base64,...`; takes precedence over `imageUrl` in UI */
+  loanImageDataUrl?: string
   referenceId?: string
   /** Display string e.g. ₹12,500 */
   totalToPay?: string
