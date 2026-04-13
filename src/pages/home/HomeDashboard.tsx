@@ -76,7 +76,7 @@ export default function HomeDashboard() {
       }
       setSnackbar({
         open: true,
-        message: 'Processing successful',
+        message: 'Processing....',
         variant: 'success',
       })
     },
