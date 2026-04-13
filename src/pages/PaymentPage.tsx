@@ -315,7 +315,7 @@ export default function PaymentPage() {
                 </div>
 
                 <button type="submit" className="payment-page__submit">
-                  Submit Payment
+                  Submit UTR
                   <FiArrowRight size={20} strokeWidth={2.25} aria-hidden />
                 </button>
                 <p className="payment-page__legal">
