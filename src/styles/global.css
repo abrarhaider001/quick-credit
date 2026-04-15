@@ -20,6 +20,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Use Poppins for numeric values/integers across the UI. */
+:where(
+    .otp-box__input,
+    .otp-timer span,
+    .profile-page__bank-number,
+    .profile-page__phone,
+    .profile-page__credit-amt,
+    .profile-page__credit-line strong,
+    .profile-page__donut-pct,
+    .home-credit__amount,
+    .home-credit__range-value,
+    .home-limit-card__value,
+    .loan-tile__figure,
+    .order-card__amt-value,
+    .order-card__total-value,
+    .order-card__detail-pair dd,
+    .order-card__due,
+    .payment-page__summary-value,
+    .payment-page__summary-account-id,
+    .payment-page__merchant-upi,
+    .payment-page__ref-input,
+    .payment-page__ref-rule
+  ) {
+  font-family: var(--qc-font-number);
+}
+
 #root {
   min-height: 100dvh;
 }

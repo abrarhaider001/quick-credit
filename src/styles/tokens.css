@@ -18,8 +18,9 @@
   --qc-focus-ring: rgba(79, 70, 229, 0.45);
 
   /* Typography */
-  --qc-font-heading: 'Poppins', 'Inter', system-ui, sans-serif;
-  --qc-font-body: 'Inter', 'Roboto', system-ui, sans-serif;
+  --qc-font-heading: 'Poppins', 'Roboto', system-ui, sans-serif;
+  --qc-font-body: 'Roboto', system-ui, sans-serif;
+  --qc-font-number: 'Poppins', 'Roboto', system-ui, sans-serif;
 
   /* Spacing & shape */
   --qc-space-sm: 16px;
