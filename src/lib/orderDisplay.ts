@@ -1,7 +1,14 @@
 import type { LoanOrder } from '@/lib/ordersStore'
 
-const FALLBACK_IMG =
-  'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=80'
+const FALLBACK_IMG = '/assets/images/user.png'
+
+function defaultLoanImageForName(loanName: string): string {
+  const normalized = loanName.trim().toLowerCase()
+  if (normalized.includes('true cash')) return '/assets/images/loan-1.jpeg'
+  if (normalized.includes('cash bee')) return '/assets/images/loan-2.jpeg'
+  if (normalized.includes('tata credit')) return '/assets/images/loan-3.jpeg'
+  return FALLBACK_IMG
+}
 
 export type EnrichedLoanOrder = LoanOrder & {
   imageUrl: string
@@ -21,7 +28,7 @@ export function enrichOrder(o: LoanOrder): EnrichedLoanOrder {
     o.loanImageDataUrl.includes(';base64,')
       ? o.loanImageDataUrl
       : undefined
-  const imageUrl = fromFirestore ?? o.imageUrl ?? FALLBACK_IMG
+  const imageUrl = fromFirestore ?? o.imageUrl ?? defaultLoanImageForName(o.loanName)
   return {
     ...o,
     imageUrl,

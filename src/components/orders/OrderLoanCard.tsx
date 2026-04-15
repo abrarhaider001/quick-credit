@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useCallback, useEffect, useState } from 'react'
-import { FiCalendar, FiChevronDown } from 'react-icons/fi'
+import { FiCalendar, FiChevronDown, FiImage } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import type { EnrichedLoanOrder } from '@/lib/orderDisplay'
 import {
@@ -23,6 +23,7 @@ const URGENT_MS = 4 * 24 * 60 * 60 * 1000
 export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
 
   const toggle = useCallback(() => setOpen((v) => !v), [])
 
@@ -58,13 +59,27 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
     isPending &&
     order.dueDateMs - now < URGENT_MS &&
     order.dueDateMs > now
+  const hasImageUrl = typeof order.imageUrl === 'string' && order.imageUrl.trim().length > 0
+  const showImage = hasImageUrl && !imageFailed
 
   return (
     <article className={`order-card${isPending ? ' order-card--pending' : ''}`}>
       <div className="order-card__head">
         <div className="order-card__identity">
           <div className="order-card__thumb">
-            <img src={order.imageUrl} alt="" loading="lazy" decoding="async" />
+            {showImage ? (
+              <img
+                src={order.imageUrl}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                onError={() => setImageFailed(true)}
+              />
+            ) : (
+              <span className="order-card__thumb-placeholder" aria-hidden>
+                <FiImage size={18} />
+              </span>
+            )}
           </div>
           <div className="order-card__titles">
             <h3 className="order-card__name">{order.loanName}</h3>

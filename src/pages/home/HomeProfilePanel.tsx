@@ -13,7 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
 import { useFirestoreUserProfile } from '@/hooks/useFirestoreUserProfile'
-import { clearCachedAuth, readCachedAuth } from '@/lib/authCache'
+import { clearCachedAuth } from '@/lib/authCache'
 import { setFirestoreOrdersSnapshot } from '@/lib/ordersStore'
 import {
   formatBankAccountFull,

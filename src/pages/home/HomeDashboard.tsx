@@ -16,6 +16,7 @@ const PRE_APPROVED_ELIGIBLE = 50000
 /** Hero art — growth / coins (Unsplash) */
 const OFFER_IMAGE =
   'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80'
+const LOAN_IMAGE_FALLBACK = '/assets/images/user.png'
 
 const RECOMMENDED_HEADLINE = '₹31,500'
 
@@ -134,6 +135,11 @@ export default function HomeDashboard() {
                   alt={loan.imageAlt}
                   loading="lazy"
                   decoding="async"
+                  onError={(event) => {
+                    const img = event.currentTarget
+                    if (img.src.endsWith(LOAN_IMAGE_FALLBACK)) return
+                    img.src = LOAN_IMAGE_FALLBACK
+                  }}
                 />
               </div>
               <div className="loan-tile__main">

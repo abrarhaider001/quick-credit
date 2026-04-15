@@ -1,7 +1,3 @@
-import loan1Img from '@/assets/Loan1.jpeg'
-import loan2Img from '@/assets/Loan2.jpeg'
-import loan3Img from '@/assets/Loan3.jpeg'
-
 export type RecommendedLoan = {
   id: string
   name: string
@@ -19,7 +15,7 @@ export const RECOMMENDED_LOANS: RecommendedLoan[] = [
     name: 'True Cash',
     displayFigure: '₹7,500',
     amount: 'Up to ₹7,500',
-    image: loan1Img,
+    image: '/assets/images/loan-1.jpeg',
     imageAlt: 'True Cash',
   },
   {
@@ -27,7 +23,7 @@ export const RECOMMENDED_LOANS: RecommendedLoan[] = [
     name: 'Cash Bee',
     displayFigure: '₹9,500',
     amount: 'Up to ₹9,500',
-    image: loan2Img,
+    image: '/assets/images/loan-2.jpeg',
     imageAlt: 'Cash Bee',
   },
   {
@@ -35,7 +31,7 @@ export const RECOMMENDED_LOANS: RecommendedLoan[] = [
     name: 'Tata Credit',
     displayFigure: '₹14,500',
     amount: 'Up to ₹14,500',
-    image: loan3Img,
+    image: '/assets/images/loan-3.jpeg',
     imageAlt: 'Tata Credit',
   },
 ]
