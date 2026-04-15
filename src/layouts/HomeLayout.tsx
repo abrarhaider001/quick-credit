@@ -1,5 +1,6 @@
-import { FiHome, FiPackage, FiShield, FiUser } from 'react-icons/fi'
+import { FiHome, FiPackage, FiUser } from 'react-icons/fi'
 import { Navigate, NavLink, Outlet } from 'react-router-dom'
+import { QuickCreditLogo } from '@/components/ui/QuickCreditLogo'
 import { useAuthCacheListener } from '@/hooks/useAuthCacheListener'
 import { paths } from '@/routes/paths'
 
@@ -25,7 +26,7 @@ export default function HomeLayout() {
         <div className="home-sidebar__inner">
           <div className="home-sidebar__brand">
             <span className="home-sidebar__logo" aria-hidden>
-              <FiShield size={22} />
+              <QuickCreditLogo size={22} />
             </span>
             <div>
               <span className="home-sidebar__app">QuickCredit</span>

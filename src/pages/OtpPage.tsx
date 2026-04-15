@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { motion } from 'framer-motion'
-import { FiClock, FiShield } from 'react-icons/fi'
+import { FiClock } from 'react-icons/fi'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { QuickCreditLogo } from '@/components/ui/QuickCreditLogo'
 import { Snackbar } from '@/components/ui/Snackbar'
 import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask } from '@/lib/phone'
@@ -162,7 +163,7 @@ export default function OtpPage() {
 
         <div className="otp-card">
           <div className="otp-brand__icon" aria-hidden>
-            <FiShield size={22} />
+            <QuickCreditLogo size={22} />
           </div>
           <h1 className="otp-title">Verification Code</h1>
           <p className="otp-instruction">

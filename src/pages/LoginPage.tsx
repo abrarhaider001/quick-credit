@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FiArrowRight, FiShield } from 'react-icons/fi'
+import { FiArrowRight } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import { QuickCreditLogo } from '@/components/ui/QuickCreditLogo'
 import { Snackbar } from '@/components/ui/Snackbar'
 import { readCachedAuth, writeCachedAuth } from '@/lib/authCache'
 import { formatPhoneLoginMask, toIndiaE164FromDigits } from '@/lib/phone'
@@ -102,7 +103,7 @@ export default function LoginPage() {
 
         <div className="login-brand">
           <div className="login-brand__icon" aria-hidden>
-            <FiShield size={24} />
+            <QuickCreditLogo size={24} />
           </div>
           <h1 className="login-brand__title">QuickCredit</h1>
           <p className="login-brand__subtitle">Create your secure gateway to growth</p>
