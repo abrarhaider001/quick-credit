@@ -2305,11 +2305,11 @@ a:hover {
 .profile-page__eye-btn {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   border: none;
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, 0.7);
   color: var(--qc-primary);
   cursor: pointer;
@@ -2377,6 +2377,39 @@ a:hover {
   font-weight: 600;
   color: #6b7280;
   line-height: 1.4;
+}
+
+.profile-page__bank-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.profile-page__bank-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--qc-primary) 26%, #ffffff);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--qc-primary) 6%, #ffffff);
+  color: var(--qc-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--qc-font-body);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.profile-page__bank-copy-btn:hover {
+  background: color-mix(in srgb, var(--qc-primary) 12%, #ffffff);
+}
+
+.profile-page__bank-copied {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #15803d;
 }
 
 .profile-page__nav--mobile {

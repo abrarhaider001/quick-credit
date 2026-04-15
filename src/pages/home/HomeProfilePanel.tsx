@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import {
   FiCheck,
   FiChevronRight,
+  FiCopy,
   FiEye,
   FiEyeOff,
   FiHelpCircle,
@@ -15,7 +16,6 @@ import { useFirestoreUserProfile } from '@/hooks/useFirestoreUserProfile'
 import { clearCachedAuth, readCachedAuth } from '@/lib/authCache'
 import { setFirestoreOrdersSnapshot } from '@/lib/ordersStore'
 import {
-  DEMO_BANK_ACCOUNT_DIGITS,
   formatBankAccountFull,
   formatBankAccountMaskedLast4,
 } from '@/lib/bankAccountFormat'
@@ -24,7 +24,7 @@ import { paths } from '@/routes/paths'
 const AVATAR_SRC = '/assets/images/user.png'
 const CREDIT_TOTAL = 34500
 const UTIL_PCT = 10
-const BANK_NAME = 'QuickCredit Partner Bank'
+const DEMO_BANK_ACCOUNT_DIGITS = '1234567890128842'
 
 const DONUT_R = 54
 const DONUT_C = 2 * Math.PI * DONUT_R
@@ -86,7 +86,7 @@ function CreditDonut({
 export default function HomeProfilePanel() {
   const navigate = useNavigate()
   const auth = useAuthCacheListener()
-  const { flags: userFlags } = useFirestoreUserProfile(auth.userId)
+  const { flags: userFlags, bankInfo } = useFirestoreUserProfile(auth.userId)
   const showBankSection = userFlags.showBankAccount !== false
 
   const displayName = auth.fullName.trim() || '---'
@@ -99,13 +99,27 @@ export default function HomeProfilePanel() {
   const availableLabel = useMemo(() => formatInr(creditAvailable), [])
 
   const [bankRevealFull, setBankRevealFull] = useState(false)
+  const [copiedAccount, setCopiedAccount] = useState(false)
+  const bankDigits = useMemo(
+    () => bankInfo.accountNumber.replace(/\D/g, '') || DEMO_BANK_ACCOUNT_DIGITS,
+    [bankInfo.accountNumber],
+  )
   const bankFormatted = useMemo(
     () =>
       bankRevealFull
-        ? formatBankAccountFull(DEMO_BANK_ACCOUNT_DIGITS)
-        : formatBankAccountMaskedLast4(DEMO_BANK_ACCOUNT_DIGITS),
-    [bankRevealFull],
+        ? formatBankAccountFull(bankDigits)
+        : formatBankAccountMaskedLast4(bankDigits),
+    [bankDigits, bankRevealFull],
   )
+  const handleCopyBankNumber = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(formatBankAccountFull(bankDigits))
+      setCopiedAccount(true)
+      window.setTimeout(() => setCopiedAccount(false), 1800)
+    } catch {
+      setCopiedAccount(false)
+    }
+  }, [bankDigits])
 
   const logout = useCallback(() => {
     setFirestoreOrdersSnapshot(null)
@@ -176,7 +190,7 @@ export default function HomeProfilePanel() {
           {showBankSection ? (
             <section className="profile-page__bank" aria-label="Bank information">
               <div className="profile-page__bank-head">
-                <p className="profile-page__bank-cap">Primary bank account</p>
+                <p className="profile-page__bank-cap">Bank account information</p>
                 <div className="profile-page__bank-trail">
                   <span className="profile-page__verified profile-page__verified--desktop">
                     <FiCheck size={12} strokeWidth={3} aria-hidden />
@@ -206,14 +220,26 @@ export default function HomeProfilePanel() {
                   </svg>
                 </div>
                 <div className="profile-page__bank-details">
-                  <p className="profile-page__bank-label">Bank account number</p>
+                  <p className="profile-page__bank-label">{bankInfo.label}</p>
                   <p
                     className={`profile-page__bank-number${bankRevealFull ? ' profile-page__bank-number--tabular' : ''}`}
                     dir="ltr"
                   >
                     {bankFormatted}
                   </p>
-                  <p className="profile-page__bank-name profile-page__bank-name--desktop">{BANK_NAME}</p>
+                  <p className="profile-page__bank-name profile-page__bank-name--desktop">{bankInfo.bankName}</p>
+                  <div className="profile-page__bank-actions">
+                    <button
+                      type="button"
+                      className="profile-page__bank-copy-btn"
+                      onClick={handleCopyBankNumber}
+                      aria-label="Copy bank account number"
+                    >
+                      <FiCopy size={15} aria-hidden />
+                      Copy account number
+                    </button>
+                    {copiedAccount ? <span className="profile-page__bank-copied">Copied</span> : null}
+                  </div>
                 </div>
               </div>
             </section>

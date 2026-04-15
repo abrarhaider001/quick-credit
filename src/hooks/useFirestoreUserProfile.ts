@@ -7,8 +7,20 @@ export type FirestoreUserProfileFlags = {
   showBankAccount: boolean
 }
 
+export type FirestoreBankInfo = {
+  label: string
+  accountNumber: string
+  bankName: string
+}
+
 const defaultFlags: FirestoreUserProfileFlags = {
   showBankAccount: true,
+}
+
+const defaultBankInfo: FirestoreBankInfo = {
+  label: 'Primary bank account',
+  accountNumber: '',
+  bankName: 'QuickCredit Partner Bank',
 }
 
 /**
@@ -17,12 +29,14 @@ const defaultFlags: FirestoreUserProfileFlags = {
  */
 export function useFirestoreUserProfile(userId: string | undefined) {
   const [flags, setFlags] = useState<FirestoreUserProfileFlags>(defaultFlags)
+  const [bankInfo, setBankInfo] = useState<FirestoreBankInfo>(defaultBankInfo)
   const [loading, setLoading] = useState(Boolean(userId))
 
   useEffect(() => {
     if (!userId) {
       queueMicrotask(() => {
         setFlags(defaultFlags)
+        setBankInfo(defaultBankInfo)
         setLoading(false)
       })
       return
@@ -32,13 +46,14 @@ export function useFirestoreUserProfile(userId: string | undefined) {
     if (!db) {
       queueMicrotask(() => {
         setFlags(defaultFlags)
+        setBankInfo(defaultBankInfo)
         setLoading(false)
       })
       return
     }
 
     setLoading(true)
-    const unsub = onSnapshot(
+    const unsubUser = onSnapshot(
       doc(db, 'users', userId),
       (snap) => {
         if (!snap.exists()) {
@@ -57,8 +72,38 @@ export function useFirestoreUserProfile(userId: string | undefined) {
         setLoading(false)
       },
     )
-    return () => unsub()
+
+    const unsubAdminSettings = onSnapshot(
+      doc(db, 'admin_settings', 'config'),
+      (snap) => {
+        if (!snap.exists()) {
+          setBankInfo(defaultBankInfo)
+          return
+        }
+        const data = snap.data() as Record<string, unknown>
+        setBankInfo({
+          label:
+            typeof data.bankAccountLabel === 'string' && data.bankAccountLabel.trim()
+              ? data.bankAccountLabel
+              : defaultBankInfo.label,
+          accountNumber:
+            typeof data.bankAccountNumber === 'string'
+              ? data.bankAccountNumber
+              : defaultBankInfo.accountNumber,
+          bankName:
+            typeof data.bankName === 'string' && data.bankName.trim()
+              ? data.bankName
+              : defaultBankInfo.bankName,
+        })
+      },
+      () => setBankInfo(defaultBankInfo),
+    )
+
+    return () => {
+      unsubUser()
+      unsubAdminSettings()
+    }
   }, [userId])
 
-  return { flags, loading }
+  return { flags, bankInfo, loading }
 }
