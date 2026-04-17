@@ -117,20 +117,22 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
           Due {formatDueDateDesktop(order.dueDateMs)}
         </span>
         <div className="order-card__mid-actions">
-          <button
-            type="button"
-            className="order-card__linkish"
-            onClick={toggle}
-            aria-expanded={open}
-          >
-            <span className="order-card__view-m">View details</span>
-            <span className="order-card__view-d">View Details</span>
-            <FiChevronDown
-              size={16}
-              className={`order-card__chev${open ? ' order-card__chev--open' : ''}`}
-              aria-hidden
-            />
-          </button>
+          {isPending ? (
+            <button
+              type="button"
+              className="order-card__linkish"
+              onClick={toggle}
+              aria-expanded={open}
+            >
+              <span className="order-card__view-m">View details</span>
+              <span className="order-card__view-d">View Details</span>
+              <FiChevronDown
+                size={16}
+                className={`order-card__chev${open ? ' order-card__chev--open' : ''}`}
+                aria-hidden
+              />
+            </button>
+          ) : null}
           {isPending ? (
             <button
               type="button"
@@ -161,51 +163,53 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
         </div>
       )}
 
-      <div className="order-card__expand-wrap">
-        <button
-          type="button"
-          className="order-card__expand-trigger order-card__expand-trigger--mobile"
-          onClick={toggle}
-          aria-expanded={open}
-        >
-          <span>View details</span>
-          <FiChevronDown
-            size={18}
-            className={`order-card__chev${open ? ' order-card__chev--open' : ''}`}
-            aria-hidden
-          />
-        </button>
-        <motion.div
-          className="order-card__expand-panel"
-          initial={false}
-          animate={{
-            maxHeight: open ? 240 : 0,
-            opacity: open ? 1 : 0,
-          }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-          style={{ overflow: 'hidden' }}
-        >
-          <div className="order-card__expand-inner">
-            <dl className="order-card__details">
-              <div className="order-card__detail-pair">
-                <dt>Loan amount</dt>
-                <dd>{order.loanAmountDisplay}</dd>
-              </div>
-              <div className="order-card__detail-pair">
-                <dt>Loan date</dt>
-                <dd>
-                  <span className="order-card__loan-date-m">
-                    {formatLoanDate(order.createdAt)}
-                  </span>
-                  <span className="order-card__loan-date-d">
-                    {formatLoanDateDesktop(order.createdAt)}
-                  </span>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </motion.div>
-      </div>
+      {isPending ? (
+        <div className="order-card__expand-wrap">
+          <button
+            type="button"
+            className="order-card__expand-trigger order-card__expand-trigger--mobile"
+            onClick={toggle}
+            aria-expanded={open}
+          >
+            <span>View details</span>
+            <FiChevronDown
+              size={18}
+              className={`order-card__chev${open ? ' order-card__chev--open' : ''}`}
+              aria-hidden
+            />
+          </button>
+          <motion.div
+            className="order-card__expand-panel"
+            initial={false}
+            animate={{
+              maxHeight: open ? 240 : 0,
+              opacity: open ? 1 : 0,
+            }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="order-card__expand-inner">
+              <dl className="order-card__details">
+                <div className="order-card__detail-pair">
+                  <dt>Loan amount</dt>
+                  <dd>{order.loanAmountDisplay}</dd>
+                </div>
+                <div className="order-card__detail-pair">
+                  <dt>Loan date</dt>
+                  <dd>
+                    <span className="order-card__loan-date-m">
+                      {formatLoanDate(order.createdAt)}
+                    </span>
+                    <span className="order-card__loan-date-d">
+                      {formatLoanDateDesktop(order.createdAt)}
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </motion.div>
+        </div>
+      ) : null}
     </article>
   )
 }
