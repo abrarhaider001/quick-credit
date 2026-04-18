@@ -7,9 +7,7 @@ import {
   FiCheck,
   FiCopy,
   FiCreditCard,
-  FiHeadphones,
   FiInfo,
-  FiShield,
 } from 'react-icons/fi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatedPage } from '@/components/layout/AnimatedPage'
@@ -23,9 +21,6 @@ import phonepeImg from '@/assets/phonepe-tbg.jpg'
 import upiImg from '@/assets/upi-tbg.webp'
 
 const DEMO_UPI_ID = 'quickcredit@upi'
-const SUPPORT_EMAIL = 'support@quickcredit.com'
-const SUPPORT_TEL_DISPLAY = '1800-000-0000'
-const SUPPORT_TEL_HREF = 'tel:+9118000000000'
 
 const PAYMENT_TILES = [
   { id: 'paytm' as const, label: 'Paytm', src: paytmImg },
@@ -324,40 +319,6 @@ export default function PaymentPage() {
               </form>
             </div>
           </div>
-
-          <aside className="payment-page__rail" aria-label="Security and support">
-            <div className="payment-page__rail-card">
-              <div className="payment-page__rail-head">
-                <FiShield size={22} strokeWidth={2} aria-hidden />
-                <h3 className="payment-page__rail-title">Secure payment protocol</h3>
-              </div>
-              <p className="payment-page__rail-text">
-                Your payment details are encrypted. We never store your full UPI PIN or passwords.
-              </p>
-              <ul className="payment-page__rail-bullets">
-                <li>No hidden fees</li>
-                <li>Instant confirmation</li>
-              </ul>
-            </div>
-
-            <div className="payment-page__rail-card payment-page__rail-card--support">
-              <div className="payment-page__rail-head">
-                <FiHeadphones size={22} strokeWidth={2} aria-hidden />
-                <h3 className="payment-page__rail-title">QuickCredit support</h3>
-              </div>
-              <p className="payment-page__rail-text">
-                Need help with this payment or your loan? Contact the QuickCredit support team — we
-                are here for billing questions, UPI issues, and account support.
-              </p>
-              <a className="payment-page__rail-cta payment-page__rail-cta--link" href={`mailto:${SUPPORT_EMAIL}`}>
-                Email support
-              </a>
-              <a className="payment-page__rail-secondary-link" href={SUPPORT_TEL_HREF}>
-                Call {SUPPORT_TEL_DISPLAY}
-              </a>
-              <p className="payment-page__rail-meta">Mon–Sat · 9am–7pm IST</p>
-            </div>
-          </aside>
         </div>
 
         <Snackbar
