@@ -1,5 +1,5 @@
 import { doc, onSnapshot } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getFirebaseDb } from '@/lib/firebase'
 
 export type FirestoreUserProfileFlags = {
@@ -23,19 +23,63 @@ const defaultBankInfo: FirestoreBankInfo = {
   bankName: 'QuickCredit Partner Bank',
 }
 
+function parseAdminBankInfo(data: Record<string, unknown>): FirestoreBankInfo {
+  return {
+    label:
+      typeof data.bankAccountLabel === 'string' && data.bankAccountLabel.trim()
+        ? data.bankAccountLabel
+        : defaultBankInfo.label,
+    accountNumber:
+      typeof data.bankAccountNumber === 'string'
+        ? data.bankAccountNumber
+        : defaultBankInfo.accountNumber,
+    bankName:
+      typeof data.bankName === 'string' && data.bankName.trim()
+        ? data.bankName
+        : defaultBankInfo.bankName,
+  }
+}
+
+function parsePerUserBankInfo(data: Record<string, unknown>): FirestoreBankInfo {
+  return {
+    label:
+      typeof data.bankAccountLabel === 'string' && data.bankAccountLabel.trim()
+        ? data.bankAccountLabel
+        : defaultBankInfo.label,
+    accountNumber:
+      typeof data.bankAccountNumber === 'string' ? data.bankAccountNumber : defaultBankInfo.accountNumber,
+    bankName:
+      typeof data.bankName === 'string' && data.bankName.trim()
+        ? data.bankName
+        : defaultBankInfo.bankName,
+  }
+}
+
 /**
- * Subscribes to `users/{userId}` for flags like `showBankAccount`.
- * If Firestore is unavailable or read fails, defaults to showing bank account.
+ * Subscribes to `users/{userId}` for flags like `showBankAccount` and bank routing:
+ * when `useGlobalBankDetails` is false (admin-assigned per-user account), shows that
+ * user's `bankAccount*` fields; otherwise shows `admin_settings/config` (see schema).
  */
 export function useFirestoreUserProfile(userId: string | undefined) {
   const [flags, setFlags] = useState<FirestoreUserProfileFlags>(defaultFlags)
   const [bankInfo, setBankInfo] = useState<FirestoreBankInfo>(defaultBankInfo)
   const [loading, setLoading] = useState(Boolean(userId))
 
+  const globalBankRef = useRef<FirestoreBankInfo>(defaultBankInfo)
+  /** `null` = use global; object = admin assigned custom bank for this user */
+  const customBankRef = useRef<FirestoreBankInfo | null>(null)
+
+  const recomputeBankInfo = () => {
+    const custom = customBankRef.current
+    setBankInfo(custom ?? globalBankRef.current)
+  }
+
   useEffect(() => {
     if (!userId) {
       queueMicrotask(() => {
         setFlags(defaultFlags)
+        customBankRef.current = null
+        globalBankRef.current = defaultBankInfo
         setBankInfo(defaultBankInfo)
         setLoading(false)
       })
@@ -46,6 +90,8 @@ export function useFirestoreUserProfile(userId: string | undefined) {
     if (!db) {
       queueMicrotask(() => {
         setFlags(defaultFlags)
+        customBankRef.current = null
+        globalBankRef.current = defaultBankInfo
         setBankInfo(defaultBankInfo)
         setLoading(false)
       })
@@ -53,11 +99,16 @@ export function useFirestoreUserProfile(userId: string | undefined) {
     }
 
     setLoading(true)
+    globalBankRef.current = defaultBankInfo
+    customBankRef.current = null
+
     const unsubUser = onSnapshot(
       doc(db, 'users', userId),
       (snap) => {
         if (!snap.exists()) {
           setFlags(defaultFlags)
+          customBankRef.current = null
+          recomputeBankInfo()
           setLoading(false)
           return
         }
@@ -65,10 +116,21 @@ export function useFirestoreUserProfile(userId: string | undefined) {
         const show =
           typeof data.showBankAccount === 'boolean' ? data.showBankAccount : true
         setFlags({ showBankAccount: show })
+
+        const useGlobal =
+          typeof data.useGlobalBankDetails === 'boolean' ? data.useGlobalBankDetails : true
+        if (useGlobal) {
+          customBankRef.current = null
+        } else {
+          customBankRef.current = parsePerUserBankInfo(data)
+        }
+        recomputeBankInfo()
         setLoading(false)
       },
       () => {
         setFlags(defaultFlags)
+        customBankRef.current = null
+        recomputeBankInfo()
         setLoading(false)
       },
     )
@@ -77,26 +139,16 @@ export function useFirestoreUserProfile(userId: string | undefined) {
       doc(db, 'admin_settings', 'config'),
       (snap) => {
         if (!snap.exists()) {
-          setBankInfo(defaultBankInfo)
-          return
+          globalBankRef.current = defaultBankInfo
+        } else {
+          globalBankRef.current = parseAdminBankInfo(snap.data() as Record<string, unknown>)
         }
-        const data = snap.data() as Record<string, unknown>
-        setBankInfo({
-          label:
-            typeof data.bankAccountLabel === 'string' && data.bankAccountLabel.trim()
-              ? data.bankAccountLabel
-              : defaultBankInfo.label,
-          accountNumber:
-            typeof data.bankAccountNumber === 'string'
-              ? data.bankAccountNumber
-              : defaultBankInfo.accountNumber,
-          bankName:
-            typeof data.bankName === 'string' && data.bankName.trim()
-              ? data.bankName
-              : defaultBankInfo.bankName,
-        })
+        recomputeBankInfo()
       },
-      () => setBankInfo(defaultBankInfo),
+      () => {
+        globalBankRef.current = defaultBankInfo
+        recomputeBankInfo()
+      },
     )
 
     return () => {
