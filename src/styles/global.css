@@ -1172,14 +1172,6 @@ a:hover {
   color: #6b7280;
 }
 
-.payment-page__loan-link {
-  margin-bottom: 24px;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(59, 130, 246, 0.06));
-  border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
 .payment-page__external-pay {
   display: inline-flex;
   align-items: center;
@@ -1193,6 +1185,10 @@ a:hover {
 
 .payment-page__external-pay:hover {
   text-decoration: underline;
+}
+
+.payment-page__external-pay--in-box {
+  margin-top: 12px;
 }
 
 .payment-page__form {
@@ -1262,6 +1258,21 @@ a:hover {
   color: #111827;
   word-break: break-all;
   line-height: 1.35;
+}
+
+.payment-page__merchant-upi--link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-break: anywhere;
+  word-break: break-word;
+  font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+}
+
+.payment-page__merchant-url-note {
+  margin: 12px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #6b7280;
 }
 
 .payment-page__copy-id {

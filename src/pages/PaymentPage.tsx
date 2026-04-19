@@ -81,6 +81,10 @@ function digitsOnly(s: string): string {
   return s.replace(/\D/g, '')
 }
 
+function isHttpOrHttpsUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url.trim())
+}
+
 export default function PaymentPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -106,9 +110,14 @@ export default function PaymentPage() {
     else navigate(paths.homeOrders)
   }, [navigate])
 
-  const copyUpi = useCallback(async () => {
+  const paymentHref = useMemo(() => loan?.paymentUrl?.trim() ?? '', [loan])
+  const paymentUrlOpenable = paymentHref.length > 0 && isHttpOrHttpsUrl(paymentHref)
+  const step1CopyText = useMemo(() => (paymentHref.length > 0 ? paymentHref : DEMO_UPI_ID), [paymentHref])
+  const step1UsesPaymentUrl = paymentHref.length > 0
+
+  const copyStep1 = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(DEMO_UPI_ID)
+      await navigator.clipboard.writeText(step1CopyText)
       setCopied(true)
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -118,7 +127,7 @@ export default function PaymentPage() {
         variant: 'error',
       })
     }
-  }, [])
+  }, [step1CopyText])
 
   const onSubmit = useCallback(
     (e: FormEvent) => {
@@ -185,24 +194,6 @@ export default function PaymentPage() {
                 </p>
               ) : null}
 
-              {/* {loan?.paymentUrl ? (
-                <section className="payment-page__loan-link" aria-label="Loan payment link">
-                  <h2 className="payment-page__step-title">Loan payment link</h2>
-                  <p className="payment-page__step-desc">
-                    Use this link to complete payment for this loan in your lender&apos;s portal.
-                  </p>
-                  <a
-                    className="payment-page__external-pay"
-                    href={loan.paymentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Open payment page
-                    <FiArrowRight size={18} strokeWidth={2.25} aria-hidden />
-                  </a>
-                </section>
-              ) : null} */}
-
               <section className="payment-page__summary" aria-label="Amount due">
                 <div className="payment-page__summary-mobile">
                   <p className="payment-page__summary-label">Total Pending Amount</p>
@@ -234,9 +225,24 @@ export default function PaymentPage() {
 
               <form className="payment-page__form" onSubmit={onSubmit} noValidate>
                 <div className="payment-page__step">
-                  <h2 className="payment-page__step-title">Step 1: Copy UPI ID</h2>
+                  <h2 className="payment-page__step-title">
+                    {step1UsesPaymentUrl ? 'Step 1: Payment link' : 'Step 1: Copy UPI ID'}
+                  </h2>
                   <p className="payment-page__step-desc">
-                    Use this ID in your preferred UPI application to initiate the transfer.
+                    {step1UsesPaymentUrl ? (
+                      <>
+                        {loan ? (
+                          <>
+                            For <strong>{loan.loanName}</strong>, open or copy this link to pay in your lender&apos;s
+                            portal. You can also use your UPI app in the steps below if you pay that way.
+                          </>
+                        ) : (
+                          'Open or copy this link to complete payment in your lender&apos;s portal.'
+                        )}
+                      </>
+                    ) : (
+                      'Use this ID in your preferred UPI application to initiate the transfer.'
+                    )}
                   </p>
                   <div className="payment-page__merchant-box">
                     <div className="payment-page__merchant-row">
@@ -244,17 +250,39 @@ export default function PaymentPage() {
                         <span className="payment-page__qr-badge" aria-hidden>
                           <FiCreditCard size={22} strokeWidth={2} />
                         </span>
-                        <span className="payment-page__merchant-upi">{DEMO_UPI_ID}</span>
+                        <span
+                          className={`payment-page__merchant-upi${step1UsesPaymentUrl ? ' payment-page__merchant-upi--link' : ''}`}
+                        >
+                          {step1CopyText}
+                        </span>
                       </div>
                       <button
                         type="button"
                         className="payment-page__copy-id"
-                        onClick={copyUpi}
+                        onClick={copyStep1}
+                        aria-label={step1UsesPaymentUrl ? 'Copy payment link' : 'Copy UPI ID'}
                       >
                         <FiCopy size={16} strokeWidth={2} aria-hidden />
-                        Copy ID
+                        {step1UsesPaymentUrl ? 'Copy link' : 'Copy ID'}
                       </button>
                     </div>
+                    {step1UsesPaymentUrl && paymentUrlOpenable ? (
+                      <a
+                        className="payment-page__external-pay payment-page__external-pay--in-box"
+                        href={paymentHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open payment page
+                        <FiArrowRight size={18} strokeWidth={2.25} aria-hidden />
+                      </a>
+                    ) : null}
+                    {/* {step1UsesPaymentUrl && !paymentUrlOpenable ? (
+                      <p className="payment-page__merchant-url-note">
+                        If this is not a web address starting with <strong>https://</strong>, copy it and use it as
+                        instructed by your lender.
+                      </p>
+                    ) : null} */}
                   </div>
                   {copied ? (
                     <p className="payment-page__copied">Copied to clipboard</p>
