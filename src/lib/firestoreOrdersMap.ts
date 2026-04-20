@@ -26,6 +26,7 @@ export function firestoreOrderToLoanOrder(docId: string, data: Record<string, un
   if (typeof data.isCompleted !== 'boolean') return null
 
   const createdAt = tsToMs(data.createdAt)
+  const loanDateMs = tsToMs(data.loanDate)
   const dueDateMs = tsToMs(data.dueDate)
 
   const loanImageDataUrl = parseLoanImageDataUrl(data.loanImageDataUrl)
@@ -36,6 +37,7 @@ export function firestoreOrderToLoanOrder(docId: string, data: Record<string, un
     amountLabel: formatInr(data.totalDueAmount),
     status: data.isCompleted ? 'cleared' : 'pending',
     createdAt,
+    loanDateMs,
     referenceId: `Ref: #${docId.slice(-8).toUpperCase()}`,
     totalToPay: formatInr(data.totalDueAmount),
     dueDateMs,

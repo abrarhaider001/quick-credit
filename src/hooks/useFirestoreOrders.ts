@@ -36,7 +36,7 @@ export function useFirestoreOrders(userId: string | undefined) {
           const o = firestoreOrderToLoanOrder(d.id, d.data() as Record<string, unknown>)
           if (o) list.push(o)
         })
-        list.sort((a, b) => b.createdAt - a.createdAt)
+        list.sort((a, b) => (b.loanDateMs ?? b.createdAt) - (a.loanDateMs ?? a.createdAt))
         setOrders(list)
         setLoading(false)
       },

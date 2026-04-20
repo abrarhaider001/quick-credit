@@ -14,14 +14,16 @@ export type EnrichedLoanOrder = LoanOrder & {
   imageUrl: string
   referenceId: string
   totalToPay: string
+  loanDateMs: number
   dueDateMs: number
   loanAmountDisplay: string
 }
 
 export function enrichOrder(o: LoanOrder): EnrichedLoanOrder {
+  const loanDateMs = o.loanDateMs ?? o.createdAt
   const due =
     o.dueDateMs ??
-    o.createdAt + 14 * 24 * 60 * 60 * 1000
+    loanDateMs + 14 * 24 * 60 * 60 * 1000
   const fromFirestore =
     typeof o.loanImageDataUrl === 'string' &&
     o.loanImageDataUrl.startsWith('data:image/') &&
@@ -34,6 +36,7 @@ export function enrichOrder(o: LoanOrder): EnrichedLoanOrder {
     imageUrl,
     referenceId: o.referenceId ?? `Ref: #${o.id.replace(/\W/g, '').slice(-8).toUpperCase()}`,
     totalToPay: o.totalToPay ?? o.amountLabel,
+    loanDateMs,
     dueDateMs: due,
     loanAmountDisplay: o.loanAmountDisplay ?? o.amountLabel,
   }

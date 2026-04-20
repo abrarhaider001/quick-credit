@@ -6,6 +6,8 @@ export type LoanOrder = {
   amountLabel: string
   status: 'pending' | 'cleared'
   createdAt: number
+  /** Firestore `orders.loanDate` (admin-editable loan date). */
+  loanDateMs?: number
   imageUrl?: string
   /** Firestore `orders.loanImageDataUrl` — `data:image/...;base64,...`; takes precedence over `imageUrl` in UI */
   loanImageDataUrl?: string

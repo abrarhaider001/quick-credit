@@ -198,10 +198,10 @@ export function OrderLoanCard({ order, variant, isDemo }: OrderLoanCardProps) {
                   <dt>Loan date</dt>
                   <dd>
                     <span className="order-card__loan-date-m">
-                      {formatLoanDate(order.createdAt)}
+                      {formatLoanDate(order.loanDateMs)}
                     </span>
                     <span className="order-card__loan-date-d">
-                      {formatLoanDateDesktop(order.createdAt)}
+                      {formatLoanDateDesktop(order.loanDateMs)}
                     </span>
                   </dd>
                 </div>
